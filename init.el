@@ -20,7 +20,7 @@
   'default-frame-alist '(width . 179))
 
 ;; Turn off menu bar, tool bar and scroll bar.
-(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+;(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 
@@ -36,6 +36,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; emacs behaviour
+
+;; add .emacs.d/elpa directory and everything under to load path
+(let* ((my-lisp-dir "~/.emacs.d/elpa/")
+        (default-directory my-lisp-dir))
+  (setq load-path (cons my-lisp-dir load-path))
+  (normal-top-level-add-subdirs-to-load-path))
 
 ;; Change the behaviour of backups and autosaves
 (setq
@@ -69,6 +75,14 @@
 (setq recentf-max-menu-items 25)
 (global-set-key "\C-x\ \C-r" 'recentf-open-files)
 
+;; Set undo tree mode globally
+(require 'undo-tree)
+(global-undo-tree-mode)
+
+;; Use diminish to hide minor modes
+(require 'diminish)
+(diminish 'undo-tree-mode)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Package management
@@ -81,6 +95,65 @@
 (package-initialize)
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Auctex and reftex modes
+
+;; load reftex and set it up so it plays nicely with Auctex
+(require 'reftex)
+(setq reftex-plug-into-AUCTeX t)
+
+;;Set Auctex to use xetex
+(setq TeX-engine 'xetex)
+
+;; set XeTeX mode in TeX/LaTeX
+(add-hook 'LaTeX-mode-hook 
+	  (lambda() 
+	    (add-to-list 
+	     'TeX-command-list 
+	     '("XeLaTeX" "%`xelatex%(mode) --shell-escape%' %t" 
+	       TeX-run-TeX nil t)) 
+	    (setq TeX-command-default "XeLaTeX") 
+	    (setq TeX-save-query nil) 
+	    (setq TeX-show-compilation nil)))
+
+;; Set up environments for Latex
+(add-hook 'LaTeX-mode-hook
+          (lambda ()
+            (LaTeX-add-environments
+              '("Theorem" LaTeX-env-label)
+              '("Lemma" LaTeX-env-label)
+              '("proof" LaTeX-env-label)
+              '("Proposition" LaTeX-env-label)
+              '("Definition" LaTeX-env-label)
+              '("Example" LaTeX-env-label)
+              '("Exercise" LaTeX-env-label)
+              '("Conjecture" LaTeX-env-label)
+              '("Corollary" LaTeX-env-label)
+              '("Remark" LaTeX-env-label)
+              '("Problem" LaTeX-env-label)
+	      )
+))
+
+;; set defaut prefixes for reftex to use on labels
+(setq reftex-label-alist
+      '(("Theorem" ?h "thm:" "~\\ref{%s}" t ("Theorem" "thm."))
+	("Lemma" ?l "lem:" "~\\ref{%s}" t ("Lemma" "lem."))
+	("Proposition" ?p "prp:" "~\\ref{%s}" t ("Proposition" "prp."))
+	("Definition" ?d "def:" "~\\ref{%s}" t ("Definition" "def."))
+	("Example" ?x "exm:" "~\\ref{%s}" t ("Example" "exm."))
+	("Exercise" ?s "ecs:" "~\\ref{%s}" t ("Exercise" "ecs."))
+	("Conjecture" ?C "coj:" "~\\ref{%s}" t ("Conjecture" "coj."))
+	("Corollary" ?c "cor:" "~\\ref{%s}" t ("Corollary" "cor."))
+	("Remark" ?r "rem:" "~\\ref{%s}" t ("Remark" "rem."))
+	("Problem" ?o "prb:" "~\\ref{%s}" t ("Remark" "prb."))
+	))
+
+
+;; So that RefTeX also recognizes \addbibresource. Note that you
+(setq reftex-bibliography-commands 
+      '("bibliography" "nobibliography" "addbibresource"))
+(setq TeX-view-program-list '(("Preview" "open %o"))) 
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Keybindings and special functions
@@ -90,6 +163,4 @@
             (lambda ()
                   (interactive)
 		  (join-line -1)))
-
-
 
