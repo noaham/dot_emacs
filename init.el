@@ -33,6 +33,18 @@
 ;; color theme
 (load-theme 'wombat t)
 
+;; theme the mode line a bit better
+;; eg get rid of ugly raised box
+(custom-set-faces
+ '(mode-line ((t (:background "#444444" 
+                  :foreground "#D9D9D9" 
+                  :box (:line-width 1 :color "#999999")))))
+ '(mode-line-inactive ((t (:inherit mode-line 
+			   :background "#444444" 
+			   :foreground "#848484" 
+			   :box (:line-width 1 :color "#848484"))))))
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; emacs behaviour
@@ -82,10 +94,10 @@
 ;; Use diminish to hide minor modes
 (require 'diminish)
 (diminish 'undo-tree-mode)
-;(diminish 'auto-complete-mode)
 
 ;; require po tip to create nice tool tip menus
 (require 'pos-tip)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Package management
@@ -94,7 +106,7 @@
 (setq package-archives
       '(("original"    . "http://tromey.com/elpa/")
         ("gnu"         . "http://elpa.gnu.org/packages/")
-	("melpa" . "http://melpa.milkbox.net/packages/")
+	("melpa"       . "http://melpa.milkbox.net/packages/")
         ("marmalade"   . "http://marmalade-repo.org/packages/")))
 (package-initialize)
 
@@ -115,13 +127,38 @@
 
 ;; add sources from ac-math to sources in latex file
 (require 'ac-math)
+(require 'auto-complete-auctex)
 (defun ac-latex-mode-setup ()
   (setq ac-sources
-     (append '(ac-source-math-latex ac-source-latex-commands ac-source-math-unicode)
-               ac-sources)))
+     (append '(ac-source-math-latex 
+	       ac-source-latex-commands
+	       ac-source-math-unicode)
+	     ac-sources)))
 ;; make this happen when latex mode is activated
+(add-hook 'LaTeX-mode-hook 'ac-latex-mode-setup)
 
-(require 'auto-complete-auctex)
+;; Set trigger key for ac
+(ac-set-trigger-key "TAB")
+
+;; For some reason flyspell doesn't work with ac so we use:
+(ac-flyspell-workaround)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Flyspell
+
+;; Emacs path variable does not contain /usr/local/bin, lets add it as
+;; that is where homebrew installs aspell
+(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
+(setq exec-path (append exec-path '("/usr/local/bin")))
+
+;; keybinding for ispell on word is below C-1
+
+;; start flyspell with latex
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+
+;; defaul dictionary should be british english
+(setq ispell-dictionary "british")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -183,7 +220,15 @@
       '("bibliography" "nobibliography" "addbibresource"))
 (setq TeX-view-program-list '(("Preview" "open %o"))) 
 
-(add-hook 'LaTeX-mode-hook 'ac-latex-mode-setup)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Yas-snippet
+
+(require 'yasnippet)
+;; Dont load yas on init, it is very slow
+;(yas/global-mode 1)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Keybindings and special functions
 
@@ -192,4 +237,8 @@
             (lambda ()
                   (interactive)
 		  (join-line -1)))
+
+;; To run ispell on word C-i
+(global-set-key (kbd "C-i") 'ispell-word) 
+
 
