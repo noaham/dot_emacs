@@ -82,7 +82,10 @@
 ;; Use diminish to hide minor modes
 (require 'diminish)
 (diminish 'undo-tree-mode)
+;(diminish 'auto-complete-mode)
 
+;; require po tip to create nice tool tip menus
+(require 'pos-tip)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Package management
@@ -91,8 +94,34 @@
 (setq package-archives
       '(("original"    . "http://tromey.com/elpa/")
         ("gnu"         . "http://elpa.gnu.org/packages/")
+	("melpa" . "http://melpa.milkbox.net/packages/")
         ("marmalade"   . "http://marmalade-repo.org/packages/")))
 (package-initialize)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Autocomplete mode
+
+;; set up ac and default config (loads default sources)
+(require 'auto-complete)
+(require 'auto-complete-config)
+(ac-config-default)
+
+;; use fuzzy matching
+(setq ac-use-fuzzy t)
+
+;; make sure that autocomplete knows about latex mode
+(add-to-list 'ac-modes 'LaTeX-mode)
+
+;; add sources from ac-math to sources in latex file
+(require 'ac-math)
+(defun ac-latex-mode-setup ()
+  (setq ac-sources
+     (append '(ac-source-math-latex ac-source-latex-commands ac-source-math-unicode)
+               ac-sources)))
+;; make this happen when latex mode is activated
+
+(require 'auto-complete-auctex)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -154,7 +183,7 @@
       '("bibliography" "nobibliography" "addbibresource"))
 (setq TeX-view-program-list '(("Preview" "open %o"))) 
 
-
+(add-hook 'LaTeX-mode-hook 'ac-latex-mode-setup)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Keybindings and special functions
 
