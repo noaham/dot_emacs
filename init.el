@@ -14,10 +14,8 @@
 ;; These should feature early so that emacs starts snappy!
 
 ;; Adjust window size
-(add-to-list
-  'default-frame-alist '(height . 82))
-(add-to-list
-  'default-frame-alist '(width . 179))
+(add-to-list 'default-frame-alist '(height . 82))
+(add-to-list 'default-frame-alist '(width . 179))
 
 ;; Turn off menu bar, tool bar and scroll bar.
 ;(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
@@ -33,16 +31,69 @@
 ;; color theme
 (load-theme 'wombat t)
 
-;; theme the mode line a bit better
-;; eg get rid of ugly raised box
+;; theme the mode line a bit better and colors for auctex
 (custom-set-faces
- '(mode-line ((t (:background "#444444" 
-                  :foreground "#D9D9D9" 
-                  :box (:line-width 1 :color "#999999")))))
- '(mode-line-inactive ((t (:inherit mode-line 
+ '(font-latex-bold-face ((t (:inherit nil 
+			     :foreground "#FFA000"
+			     :weight bold
+			     ))))
+ '(font-latex-math-face ((t (:inherit nil 
+			     :foreground "#DCCEFF"
+			     ))))
+ '(font-latex-italic-face ((t (:inherit nil 
+			       :foreground "#FFA000"
+			       :slant italic
+			       ))))
+ '(font-latex-sectioning-0-face ((t (:inherit nil 
+				     :foreground "#FFE00D"
+				     :height 1.5
+				     ))))
+ '(font-latex-sectioning-1-face ((t (:inherit nil 
+				     :foreground "#FFE00D"
+				     :height 1.4
+				     ))))
+ '(font-latex-sectioning-2-face ((t (:inherit nil 
+				     :foreground "#FFE00D"
+				     :height 1.3
+				     ))))
+ '(font-latex-sectioning-3-face ((t (:inherit nil 
+				     :foreground "#FFE00D"
+				     :height 1.2
+				     ))))
+ '(font-latex-sectioning-4-face ((t (:inherit nil 
+				     :foreground "#FFE00D"
+				     :height 1.1
+				     ))))
+ '(font-latex-sectioning-5-face ((t (:inherit nil 
+				     :foreground "#FFE00D"
+				     :height 1
+				     ))))
+ '(font-latex-slide-title-face ((t (:inherit nil 
+				    :foreground "#FFA000"
+				    :underline t
+				    ))))
+ '(font-latex-string-face ((t (:inherit nil 
+			       :foreground "#E5786D"
+			       ))))
+ '(font-latex-warning-face ((t (:inherit nil 
+			       :foreground "#FF3300"
+			       ))))
+ '(font-lock-type-face ((t (:inherit nil 
+			    :foreground "#FFA000"
+			    :weight bold
+			    ))))
+ '(mode-line ((t (
+		  :background "#444444" 
+		  :foreground "#D9D9D9" 
+		  :box (:line-width 1 :color "#999999")
+		  ))))
+ '(mode-line-inactive ((t (
+			   :inherit mode-line 
 			   :background "#444444" 
 			   :foreground "#848484" 
-			   :box (:line-width 1 :color "#848484"))))))
+			   :box (:line-width 1 :color "#848484")
+			   ))))
+)
 
 
 
@@ -50,10 +101,10 @@
 ;;;; emacs behaviour
 
 ;; add .emacs.d/elpa directory and everything under to load path
-(let* ((my-lisp-dir "~/.emacs.d/elpa/")
-        (default-directory my-lisp-dir))
+(let* ((my-lisp-dir "~/.emacs.d/elpa/") (default-directory my-lisp-dir))
   (setq load-path (cons my-lisp-dir load-path))
-  (normal-top-level-add-subdirs-to-load-path))
+  (normal-top-level-add-subdirs-to-load-path)
+  )
 
 ;; Change the behaviour of backups and autosaves
 (setq
@@ -110,38 +161,6 @@
         ("marmalade"   . "http://marmalade-repo.org/packages/")))
 (package-initialize)
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Autocomplete mode
-
-;; set up ac and default config (loads default sources)
-(require 'auto-complete)
-(require 'auto-complete-config)
-(ac-config-default)
-
-;; use fuzzy matching
-(setq ac-use-fuzzy t)
-
-;; make sure that autocomplete knows about latex mode
-(add-to-list 'ac-modes 'LaTeX-mode)
-
-;; add sources from ac-math to sources in latex file
-(require 'ac-math)
-(require 'auto-complete-auctex)
-(defun ac-latex-mode-setup ()
-  (setq ac-sources
-     (append '(ac-source-math-latex 
-	       ac-source-latex-commands
-	       ac-source-math-unicode)
-	     ac-sources)))
-;; make this happen when latex mode is activated
-(add-hook 'LaTeX-mode-hook 'ac-latex-mode-setup)
-
-;; Set trigger key for ac
-(ac-set-trigger-key "TAB")
-
-;; For some reason flyspell doesn't work with ac so we use:
-(ac-flyspell-workaround)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -226,7 +245,59 @@
 
 (require 'yasnippet)
 ;; Dont load yas on init, it is very slow
-;(yas/global-mode 1)
+(yas/global-mode 1)
+
+;; Get rid of default x-prompt when multiple snippets
+(setq yas-prompt-functions '(
+			     yas-dropdown-prompt 
+			     yas-completing-prompt 
+			     yas-ido-prompt
+			     yas-no-prompt
+			     ))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Autocomplete mode
+
+;; set up ac and default config (loads default sources)
+(require 'auto-complete-config)
+(ac-config-default)
+
+;; use fuzzy matching
+(setq ac-use-fuzzy t)
+
+;; make sure that autocomplete knows about latex mode
+(add-to-list 'ac-modes 'LaTeX-mode)
+
+;; add sources from ac-math to sources in latex file
+(require 'ac-math)
+(require 'auto-complete-auctex)
+(defun ac-latex-mode-setup ()
+  (setq ac-sources
+     (append '(
+	       ac-source-math-latex 
+	       ac-source-latex-commands
+	       ac-source-math-unicode
+	       ac-source-yasnippet
+	       )
+	     ac-sources)))
+;; make this happen when latex mode is activated
+(add-hook 'LaTeX-mode-hook 'ac-latex-mode-setup)
+
+;; Set trigger key for ac
+;(ac-set-trigger-key "TAB")
+;(ac-set-trigger-key "<tab>")
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ac-auto-start t)
+ '(ac-trigger-key "TAB")
+ '(ac-use-menu-map t))
+
+;; For some reason flyspell doesn't work with ac so we use:
+(ac-flyspell-workaround)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -238,7 +309,6 @@
                   (interactive)
 		  (join-line -1)))
 
-;; To run ispell on word C-i
-(global-set-key (kbd "C-i") 'ispell-word) 
-
+;; To run ispell on word C-'
+(global-set-key (kbd "C-'") 'ispell-word)
 
