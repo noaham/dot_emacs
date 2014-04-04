@@ -1,0 +1,19 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: research note
+# key: res
+# --
+\documentclass[a4paper]{research_note}
+${1:\usepackage{$2}}
+
+\title{$3}
+\author{${4:Noah White}}
+\datestamp{${5:`(format-time-string "%d %B %Y" (current-time))`}}
+\comments{$6} 
+
+\begin{document}
+
+\maketitle
+
+$0
+
+\end{document}

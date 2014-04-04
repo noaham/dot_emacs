@@ -28,6 +28,9 @@
 ;; Turn on line numbering
 (if (fboundp 'global-linum-mode) (global-linum-mode 1))
 
+;; set a nicer font
+(add-to-list 'default-frame-alist '(font . "Consolas-13"))
+
 ;; color theme
 (load-theme 'wombat t)
 
@@ -149,6 +152,8 @@
 ;; require po tip to create nice tool tip menus
 (require 'pos-tip)
 
+(require 'tex-site)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Package management
@@ -168,8 +173,8 @@
 
 ;; Emacs path variable does not contain /usr/local/bin, lets add it as
 ;; that is where homebrew installs aspell
-(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
-(setq exec-path (append exec-path '("/usr/local/bin")))
+(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin:/usr/texbin/"))
+(setq exec-path (append exec-path '("/usr/local/bin:/usr/texbin/")))
 
 ;; keybinding for ispell on word is below C-1
 
@@ -239,6 +244,10 @@
       '("bibliography" "nobibliography" "addbibresource"))
 (setq TeX-view-program-list '(("Preview" "open %o"))) 
 
+;; in order to use custom latex classes etc we need to set the texinputs
+;; environment variable
+(setenv "TEXINPUTS" ".:~/latex:")
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Yas-snippet
@@ -285,20 +294,20 @@
 (add-hook 'LaTeX-mode-hook 'ac-latex-mode-setup)
 
 ;; Set trigger key for ac
-;(ac-set-trigger-key "TAB")
-;(ac-set-trigger-key "<tab>")
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ac-auto-start t)
- '(ac-trigger-key "TAB")
- '(ac-use-menu-map t))
+;; we want ac to only complete after at least three letters
+;; this way we can use short letter combinations for common
+;; yas snippets
+(setq
+ ac-auto-start 2
+ ac-trigger-key "TAB"
+ ac-use-menu-map t)
 
 ;; For some reason flyspell doesn't work with ac so we use:
 (ac-flyspell-workaround)
 
+(setq ac-ignores '(
+		   i
+		   ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Keybindings and special functions

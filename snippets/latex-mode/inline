@@ -1,0 +1,5 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: inline mathematics
+# key: i
+# --
+\\( $1 \\)$0
