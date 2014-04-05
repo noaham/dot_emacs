@@ -173,8 +173,8 @@
 
 ;; Emacs path variable does not contain /usr/local/bin, lets add it as
 ;; that is where homebrew installs aspell
-(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin:/usr/texbin/"))
-(setq exec-path (append exec-path '("/usr/local/bin:/usr/texbin/")))
+(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
+(setq exec-path (append exec-path '("/usr/local/bin")))
 
 ;; keybinding for ispell on word is below C-1
 
@@ -248,6 +248,10 @@
 ;; environment variable
 (setenv "TEXINPUTS" ".:~/latex:")
 
+;; emacs is missing /usr/texbin in its path, lets add it
+(setenv "PATH" (concat (getenv "PATH") ":/usr/texbin"))
+(setq exec-path (append exec-path '("/usr/texbin")))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Yas-snippet
@@ -305,9 +309,11 @@
 ;; For some reason flyspell doesn't work with ac so we use:
 (ac-flyspell-workaround)
 
-(setq ac-ignores '(
-		   i
-		   ))
+;(setq ac-ignores '(
+;		   i
+;		   ))
+(load "~/.emacs.d/ac-ignores")
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Keybindings and special functions

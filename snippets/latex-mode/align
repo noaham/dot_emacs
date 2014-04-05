@@ -1,0 +1,7 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: align math
+# key: am
+# --
+\begin{align*}
+$0
+\end{align*}

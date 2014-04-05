@@ -3,7 +3,49 @@
 # key: res
 # --
 \documentclass[a4paper]{research_note}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage[style=alphabetic]{biblatex}
 ${1:\usepackage{$2}}
+
+
+% small piece of code to fix a clash between amsthm and parkip which causes
+% theorems to have zero space to previous line
+\makeatletter
+\def\thm@space@setup{%
+  \thm@preskip=\parskip \thm@postskip=0pt
+}
+\makeatother
+
+\newtheorem{Theorem}[equation]{Theorem}
+\newtheorem{Proposition}[equation]{Proposition}
+\newtheorem{Lemma}[equation]{Lemma}
+\newtheorem{Corollary}[equation]{Corollary}
+\newtheorem{Conjecture}[equation]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{Definition}[equation]{Definition}
+\newtheorem{Example}[equation]{Example}
+\theoremstyle{remark}
+\newtheorem{Remark}[equation]{Remark}
+
+\numberwithin{equation}{section}
+
+% for f:X -> Y; the default spacing isn't great
+\newcommand{\map}[2]{\,{:}\,#1\!\longrightarrow\!#2}
+% set with conditions (fixes spacing issues) 
+% e.g: \set{x\in |R}{x>0} is the set of all possible real numbers
+\newcommand{\setc}[2]{\left\{\:\!#1\:|\:\!#2\!\:\right\}}
+% set without conditions e.g. \set{1,2,3}, just fixes spacing issues
+\newcommand{\set}[1]{\left\{\,\!#1\,\!\right\}}
+
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\PP}{\mathbb{P}}
+
+\addbibresource{bibliography.bib}
 
 \title{$3}
 \author{${4:Noah White}}
