@@ -14,7 +14,7 @@ The following packages are loaded
 
 + **[saveplace](http://www.emacswiki.org/emacs/SavePlace)** when opeing a file returns the cursor to the last position.
 + **[uniquify](https://www.gnu.org/software/emacs/manual/html_node/emacs/Uniquify.html)** better buffer names.
-+ **[recentf]https://www.gnu.org/software/emacs/manual/html_node/emacs/File-Conveniences.html)** maintains a list of recently visited files.
++ **[recentf](https://www.gnu.org/software/emacs/manual/html_node/emacs/File-Conveniences.html)** maintains a list of recently visited files.
 + **[undo-tree](http://www.dr-qubit.org/emacs.php#undo-tree-docs)** visual undo.
 + **[diminish](http://www.emacswiki.org/emacs/DiminishedModes)** hide minor modes in mode line.
 + **[visual-line-mode](http://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-Mode.html)** wrap lines intelligently, don't break words when possible.
