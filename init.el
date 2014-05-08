@@ -1,21 +1,39 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                                                                        ;;;;
-;;;; dot emacs                                                              ;;;;
+;;;; # dot emacs                                                            ;;;;
 ;;;;                                                                        ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+;;
+;; ## Contents
+;; 
+;; + Appearance
+;; + Emacs behaviour
+;; + Package management
+;; + Flyspell mode
+;; + Auctex and reftex modes
+;; + Yasnippet mode
+;; + Autocomplete mode
+;; + Smart-parens mode
+;; + Key bindings and special functions
+;; 
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Appearance
+;; ## Appearance
 
 
 ;; These should feature early so that emacs starts snappy!
 
-;; Adjust window size
-(add-to-list 'default-frame-alist '(height . 82))
-(add-to-list 'default-frame-alist '(width . 179))
+;; Adjust window size and have it start top left
+(setq default-frame-alist '((top + 0) 
+			    (left + 0) 
+			    (height . 82) 
+			    (width . 179)))
 
 ;; Turn off menu bar, tool bar and scroll bar.
 ;(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
@@ -101,7 +119,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; emacs behaviour
+;; ## emacs behaviour
 
 ;; add .emacs.d/elpa directory and everything under to load path
 (let* ((my-lisp-dir "~/.emacs.d/elpa/") (default-directory my-lisp-dir))
@@ -129,7 +147,7 @@
 ;; The bell is super annoying, turn it off
 (setq ring-bell-function 'ignore)
 
-;; If multiple buffers with the same name exist create beeter unique names
+;; If multiple buffers with the same name exist create better unique names
 (require 'uniquify)
 (setq 
   uniquify-buffer-name-style 'reverse
@@ -149,14 +167,17 @@
 (require 'diminish)
 (diminish 'undo-tree-mode)
 
-;; require po tip to create nice tool tip menus
-(require 'pos-tip)
-
 (require 'tex-site)
+
+;; enable visual-line mode (stop breaking in middle of words
+;; also gets rid of annoying line break indicators.
+(global-visual-line-mode 1)
+(diminish 'global-visual-line-mode)
+(diminish 'visual-line-mode)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Package management
+;; ## Package management
 
 ;; Define repositories
 (setq package-archives
@@ -169,7 +190,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Flyspell
+;; ## Flyspell
 
 ;; Emacs path variable does not contain /usr/local/bin, lets add it as
 ;; that is where homebrew installs aspell
@@ -186,11 +207,14 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Auctex and reftex modes
+;; ## Auctex and reftex modes
 
 ;; load reftex and set it up so it plays nicely with Auctex
 (require 'reftex)
 (setq reftex-plug-into-AUCTeX t)
+
+;; skip extra step when reftex-reference is invoked
+(setq reftex-ref-macro-prompt nil)
 
 ;;Set Auctex to use xetex
 (setq TeX-engine 'xetex)
@@ -254,11 +278,12 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Yas-snippet
+;; ## Yas-snippet
 
 (require 'yasnippet)
 ;; Dont load yas on init, it is very slow
-(yas/global-mode 1)
+(yas-global-mode 1)
+(diminish 'yas-minor-mode)
 
 ;; Get rid of default x-prompt when multiple snippets
 (setq yas-prompt-functions '(
@@ -269,8 +294,8 @@
 			     ))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Autocomplete mode
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ;; ## Autocomplete mode
 
 ;; set up ac and default config (loads default sources)
 (require 'auto-complete-config)
@@ -309,14 +334,25 @@
 ;; For some reason flyspell doesn't work with ac so we use:
 (ac-flyspell-workaround)
 
-;(setq ac-ignores '(
-;		   i
-;		   ))
+;; set yas keys as ac-ignores
 (load "~/.emacs.d/ac-ignores")
+
+;; diminish AC mode
+(diminish 'auto-complete-mode)
+
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Keybindings and special functions
+;; ## smart-parens mode
+
+;; Enable smart-parents mode
+(smartparens-global-mode t)
+(diminish 'smartparens-mode)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ## Keybindings and special functions
 
 ;; Join current line with next line
 (global-set-key (kbd "M-j")
