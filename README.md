@@ -23,6 +23,7 @@ The following packages are loaded
 + **[yasnippet](https://github.com/capitaomorte/yasnippet)** insert and complete snippets.
 + **[auto-complete](http://cx4a.org/software/auto-complete/)** does what it says on the tin.
 + **[smartparens](https://github.com/Fuco1/smartparens)** automatic parenthesis matching.
++ **[markdown-mode+](https://github.com/milkypostman/markdown-mode-plus)** mode for editing markdown, extension of [markdown-mode](http://jblevins.org/projects/markdown-mode/).
 
 ## Issues
 
@@ -42,6 +43,9 @@ it seems that automcomplete for some reason takes priority no matter what I do. 
 way I solved this was to add `ac-source-yasnippet` to my `ac-sources` list and to add 
 my yas keys to `ac-ignores`. This works quite well.
 
+
 ### Slow load
 
 Emacs is slow to load. Since I want to load so many packages this is just a fact of life. However loading `auto-complete-auctex` takes this from 2 seconds to 6. The solution is to run `emacs --daemon` on login and then run `emacsclient -n -c` to produce a new gui emacs window. However I am running [Yamamoto Matsumura's OSX port](https://github.com/railwaycat/emacs-mac-port) (which is excellent) and this is not supported. Guess I just wont ever shut emacs down!
+
+
