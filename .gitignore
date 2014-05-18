@@ -5,4 +5,7 @@ elpa
 places
 ac-comphist.dat
 url
-magma-mode.el
+.cask
+private.el
+savehist
+site-lisp/magma-mode/*
