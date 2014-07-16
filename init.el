@@ -23,7 +23,8 @@
 (use-package smart-mode-line
   :config
   (progn
-    (setq sml/theme 'respectful
+    (load-theme 'smart-mode-line-respectful :no-confirm)
+    (setq sml/theme nil
           sml/hidden-modes "\\([A-z]\\|[-]\\)*")
     (sml/setup)))
 (setq ring-bell-function 'ignore)
@@ -166,6 +167,16 @@
   :mode "\\.m\\'"
   :pre-load
   (add-to-list 'load-path "~/.emacs.d/site-lisp/magma-mode"))
+(use-package haskell-mode
+  :mode "\\.hs\\'"
+  :config
+  (progn
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+    ))
+(use-package python-mode
+  :mode "\\.sage\\'"
+  )
 (use-package mmm-auto
 			 :init
 			 (progn

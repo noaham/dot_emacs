@@ -17,6 +17,7 @@ TODO:
 
 + Learn and implement keybindings for smartparens movement commands
 + tone down the greys in the base16-brewer-light theme
++ configure mmm-mode so that I can simply write elisp instead of emacs-lisp next to fenced code blocks. This is desirable as github recognised applies syntax highlighting to blocks with the keyword elisp but not emacs-lisp. 
 
 
 ## Package management ##
@@ -141,7 +142,8 @@ The default mode line is ugly and cluttered. [Smart-mode-line][] is a nice solut
 (use-package smart-mode-line
   :config
   (progn
-    (setq sml/theme 'respectful
+    (load-theme 'smart-mode-line-respectful :no-confirm)
+    (setq sml/theme nil
           sml/hidden-modes "\\([A-z]\\|[-]\\)*")
     (sml/setup)))
 ```
@@ -502,6 +504,32 @@ Magma is a computer algebra package, the package [magma-mode][] provides syntax 
   :pre-load
   (add-to-list 'load-path "~/.emacs.d/site-lisp/magma-mode"))
 ```
+
+### Haskell ###
+
+Here I load Haskell mode. At the moment there is no fancy configuration.
+
+```emacs-lisp
+(use-package haskell-mode
+  :mode "\\.hs\\'"
+  :config
+  (progn
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+    ))
+```
+
+
+### Python ###
+
+I want to load python when I am editting sage files
+
+```emacs-lisp
+(use-package python-mode
+  :mode "\\.sage\\'"
+  )
+```
+
 
 
 ## Multiple major modes ##
