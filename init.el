@@ -66,6 +66,9 @@
   :init
   (global-undo-tree-mode))
 (global-visual-line-mode 1)
+(use-package browse-kill-ring
+  :bind ("C-c C-y" . browse-kill-ring)
+  )
 (use-package flyspell
   :bind
   ("C-'" . ispell-word)

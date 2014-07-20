@@ -267,6 +267,16 @@ Almost always I want lines to break at words rather than half way through a word
 (global-visual-line-mode 1)
 ```
 
+### Browse kill ring ###
+
+This turns on a handy package to browse the kill ring. it is called with `browse-kill-ring` which is bound to `C-c C-y`.
+
+```emacs-lisp
+(use-package browse-kill-ring
+  :bind ("C-c C-y" . browse-kill-ring)
+  )
+```
+
 ### Spelling ###
 
 The package [flyspell][] enables on-the-fly spell checking. It is fairly intelligent and ignores latex commands etc. my default keybinding to correct the word at point is `C-'`.
