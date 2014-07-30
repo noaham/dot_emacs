@@ -177,15 +177,18 @@ The way emacs handles backup file is annoying also. It saves a file ending in `"
 
 ### Command history ###
 
-Saving command history across emacs sessions is really useful. History is saved to the `~/.emacs.d/savehist` file
+Saving command history across emacs sessions is really useful. History is saved to the `~/.emacs.d/history` file. Note that it is important to have `savehist-mode` activated after costomising `savehist-file` (which I haven't done here), otherwise the history is cleared.
 
 ```emacs-lisp
-(savehist-mode 1)
-(setq savehist-file "~/.emacs.d/savehist"
-      history-length 100
-      history-delete-duplicates t
-      savehist-additional-variables '(search-ring
-                                      regexp-search-ring))
+(use-package savehist
+  :config
+  (progn
+    (savehist-mode 1)
+    (setq history-length 100
+          history-delete-duplicates t
+          savehist-additional-variables '(search-ring
+                                          regexp-search-ring)))
+)
 ```
 
 ### Save place in file ###
@@ -234,6 +237,8 @@ I also bind `C-x C-b` to `buffer-menu`instead of `buffer-list`.
 
 Maintain a list of recent files using [recentf-mode][]. This is fairly self explanitory. We access the list using `C-x C-r`. This conflicts with open read only but I have no use for this.
 
+I would like the file where recentf keeps its records to be in my .emacs.d/ directory. The way to do this is to alter the `recentf-save-file` variable. Note that `(recentf-mode t)` needs to come after customising this variable as otherwise it doesn't work.
+
 [recentf-mode]: http://www.emacswiki.org/emacs/RecentFiles
 
 ```emacs-lisp
@@ -241,8 +246,11 @@ Maintain a list of recent files using [recentf-mode][]. This is fairly self expl
   :bind ("C-x C-r" . recentf-open-files)
   :init
   (progn
+    (setq recentf-save-file "~/.emacs.d/.recentf")
     (recentf-mode t)
-    (setq recentf-max-menu-items 25)))
+    (setq recentf-max-menu-items 25)
+    (add-to-list 'recentf-exclude "\\.emacs.d/.cask/")
+    ))
 ```
 
 ### Undo-tree ###
@@ -558,7 +566,7 @@ would be detected as a region which should use python-mode. To have mmm-mode sca
 
 The code used to do this is taken straight from the definition of the here-document submode which is built in. It is only very slightly changed.
 
-The only problem I have experecned with this is that indentation does not seem to work so well in the submode regions. As a work-around I usually ahve another buffer open where I do the coding and then copy and past it into the markdown file.
+The only problem I have experienced with this is that indentation does not seem to work so well in the submode regions. As a work-around I usually have another buffer open where I do the coding and then copy and past it into the markdown file.
 
 [mmm-mode]: https://github.com/purcell/mmm-mode
 

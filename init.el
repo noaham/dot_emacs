@@ -37,12 +37,15 @@
       kept-new-versions 6
       kept-old-versions 2
       version-control t)
-(savehist-mode 1)
-(setq savehist-file "~/.emacs.d/savehist"
-      history-length 100
-      history-delete-duplicates t
-      savehist-additional-variables '(search-ring
-                                      regexp-search-ring))
+(use-package savehist
+  :config
+  (progn
+    (savehist-mode 1)
+    (setq history-length 100
+          history-delete-duplicates t
+          savehist-additional-variables '(search-ring
+                                          regexp-search-ring)))
+)
 (use-package saveplace
   :init
   (progn
@@ -60,8 +63,11 @@
   :bind ("C-x C-r" . recentf-open-files)
   :init
   (progn
+    (setq recentf-save-file "~/.emacs.d/.recentf")
     (recentf-mode t)
-    (setq recentf-max-menu-items 25)))
+    (setq recentf-max-menu-items 25)
+    (add-to-list 'recentf-exclude "\\.emacs.d/.cask/")
+    ))
 (use-package undo-tree
   :init
   (global-undo-tree-mode))
