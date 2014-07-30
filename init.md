@@ -1,6 +1,6 @@
 # Emacs init #
 
-- [Introduction][]
+- [Introduction](#Introduction)
 - [Package management][]
     - [use][]-package
     - [Paradox][]
