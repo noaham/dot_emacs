@@ -17,6 +17,7 @@
 (depends-on "git-rebase-mode")
 (depends-on "god-mode")
 (depends-on "haskell-mode")
+(depends-on "helm")
 (depends-on "magit")
 (depends-on "markdown-mode+")
 (depends-on "mmm-mode")

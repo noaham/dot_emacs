@@ -22,6 +22,7 @@
     - [Browse kill ring](#Browse-kill-ring)
     - [Spelling](#Spelling)
     - [Popwin](#Popwin)
+    - [Helm](#Helm)
 - [Editing](#Editing)
     - [Auto-complete](#Auto-complete)
     - [Smartparens](#Smartparens)
@@ -356,6 +357,26 @@ We also make sure flyspell starts by default in LaTeX and markdown modes.
 (use-package popwin
   :init
   (popwin-mode 1))
+```
+
+
+### Helm <a name="Helm" /> ###
+
+[Helm][] is a completion and search package for emacs. It is kind of difficult to explain what it is, so just check out the website.
+
+[Helm]: https://github.com/emacs-helm/helm
+
+```emacs-lisp
+(use-package helm
+  :bind (("M-x" . helm-M-x)
+         ("M-y" . helm-show-kill-ring)
+         ("C-x b" . helm-mini)
+         ("C-x C-f" . helm-find-files))
+  :init
+  (progn
+    (require 'helm-config)
+    (helm-mode 1))
+  )
 ```
 
 

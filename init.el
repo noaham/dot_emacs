@@ -86,6 +86,16 @@
 (use-package popwin
   :init
   (popwin-mode 1))
+(use-package helm
+  :bind (("M-x" . helm-M-x)
+         ("M-y" . helm-show-kill-ring)
+         ("C-x b" . helm-mini)
+         ("C-x C-f" . helm-find-files))
+  :init
+  (progn
+    (require 'helm-config)
+    (helm-mode 1))
+  )
 (use-package auto-complete-config
   :config
   (progn
