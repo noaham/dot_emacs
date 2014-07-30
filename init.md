@@ -1,5 +1,45 @@
 # Emacs init #
 
+- [Introduction][]
+- [Package management][]
+    - [use][]-package
+    - [Paradox][]
+- [Emacs appearance][]
+    - [Window appearance][]
+    - [Line numbering][]
+    - [Theme][]
+    - [Font][]
+    - [Mode line][]
+- [Emacs behaviour][]
+    - [Backups and autosaves][]
+    - [Command history][]
+    - [Save place in file][]
+    - [Indentation and tabs][]
+    - [Windmove][]
+    - [Recent files][]
+    - [Undo][]-tree
+    - [Line breaking][]
+    - [Browse kill ring][]
+    - [Spelling][]
+    - [Popwin][]
+- [Editing][]
+    - [Auto][]-complete
+    - [Smartparens][]
+    - [Expand region][]
+    - [Yasnippet][]
+- [Markdown][]
+- [LaTeX][]
+    - [AUCTeX][]
+    - [RefTeX][]
+- [Programming][]
+    - [Magma][]
+    - [Haskell][]
+    - [Python][]
+- [Multiple major modes][]
+- [Key bindings][]
+
+## Introduction ##
+
 This is my emacs init file. It written in markdown and then use `sed` to strip out the elisp in fenced code blocks. This is so that I can heavily comment on how certain things work. This file and the files it depends on are kept up-to-date in a [github repository][]. Hopefully someone will find this helpful.
 
 At the moment I am using Yamamoto Mitsuharu's [emacs mac port][]. This port has much better integration with OSX including full screen mode and pixel scrolling. You can obtain this version of emacs using [homebrew][].
