@@ -38,7 +38,7 @@
 - [Multiple major modes][]
 - [Key bindings][]
 
-## Introduction ##
+## Introduction ##<a name="Introduction"/>
 
 This is my emacs init file. It written in markdown and then use `sed` to strip out the elisp in fenced code blocks. This is so that I can heavily comment on how certain things work. This file and the files it depends on are kept up-to-date in a [github repository][]. Hopefully someone will find this helpful.
 
