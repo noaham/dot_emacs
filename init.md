@@ -1,42 +1,42 @@
 # Emacs init #
 
 - [Introduction](#Introduction)
-- [Package management][]
-    - [use][]-package
-    - [Paradox][]
-- [Emacs appearance][]
-    - [Window appearance][]
-    - [Line numbering][]
-    - [Theme][]
-    - [Font][]
-    - [Mode line][]
-- [Emacs behaviour][]
-    - [Backups and autosaves][]
-    - [Command history][]
-    - [Save place in file][]
-    - [Indentation and tabs][]
-    - [Windmove][]
-    - [Recent files][]
-    - [Undo][]-tree
-    - [Line breaking][]
-    - [Browse kill ring][]
-    - [Spelling][]
-    - [Popwin][]
-- [Editing][]
-    - [Auto][]-complete
-    - [Smartparens][]
-    - [Expand region][]
-    - [Yasnippet][]
-- [Markdown][]
-- [LaTeX][]
-    - [AUCTeX][]
-    - [RefTeX][]
-- [Programming][]
-    - [Magma][]
-    - [Haskell][]
-    - [Python][]
-- [Multiple major modes][]
-- [Key bindings][]
+- [Package management](#Package-management)
+    - [use-package](#use-package)
+    - [Paradox](#Paradox)
+- [Emacs appearance](#Emacs-appearance)
+    - [Window appearance](#Window-appearance)
+    - [Line numbering](#Line-numbering)
+    - [Theme](#Theme)
+    - [Font](#Font)
+    - [Mode line](#Mode-line)
+- [Emacs behaviour](#Emacs-behaviour)
+    - [Backups and autosaves](#Backups-and-autosaves)
+    - [Command history](#Command-history)
+    - [Save place in file](#Save-place-in-file)
+    - [Indentation and tabs](#Indentation-and-tabs)
+    - [Windmove](#Windmove)
+    - [Recent files](#Recent-files)
+    - [Undo-tree](#Undo-tree)
+    - [Line breaking](#Line-breaking)
+    - [Browse kill ring](#Browse-kill-ring)
+    - [Spelling](#Spelling)
+    - [Popwin](#Popwin)
+- [Editing](#Editing)
+    - [Auto-complete](#Auto-complete)
+    - [Smartparens](#Smartparens)
+    - [Expand region](#Expand-region)
+    - [Yasnippet](#Yasnippet)
+- [Markdown](#Markdown)
+- [LaTeX](#LaTeX)
+    - [AUCTeX](#AUCTeX)
+    - [RefTeX](#RefTeX)
+- [Programming](#Programming)
+    - [Magma](#Magma)
+    - [Haskell](#Haskell)
+    - [Python](#Python)
+- [Multiple major modes](#Multiple-major-modes)
+- [Key bindings](#Key-bindings)
 
 ## Introduction <a name="Introduction"/> ##
 
@@ -60,7 +60,7 @@ TODO:
 + configure mmm-mode so that I can simply write elisp instead of emacs-lisp next to fenced code blocks. This is desirable as github recognised applies syntax highlighting to blocks with the keyword elisp but not emacs-lisp. 
 
 
-## Package management ##
+## Package management <a name="Package-management" /> ##
 
 The very first thing we do is set up [cask][] and [pallet][]. These two utilities work in tandem to keep track of packages which I use and to make sure they are installed when emacs starts. The [Cask](./Cask) file defines which repositories package should use and which packages should be installed.
 
@@ -74,7 +74,7 @@ The very first thing we do is set up [cask][] and [pallet][]. These two utilitie
 (require 'pallet)
 ```
     
-### use-package ###
+### use-package <a name="use-package" /> ###
 
 [Use-package][] is a useful macro for organising how packages are loaded in my init file. In particular it will only load a package if it is available.
 
@@ -96,7 +96,7 @@ It is probably best to see the use-package website or below for examples.
       use-package-idle-interval 10)
 ```
 
-### Paradox ###
+### Paradox <a name="Paradox" /> ###
 
 [Paradox][] is a nice package which cleans up the package-list buffer. It lists github stars and can also integrate with my github if I supply it wit a provate github token so that I can star repositories from the package men, but I don't want this so I set `paradox-github-token` to `t`.
 
@@ -111,11 +111,11 @@ It is probably best to see the use-package website or below for examples.
 
 
 
-## Emacs appearance ##
+## Emacs appearance <a name="Emacs-appearance" /> ##
 
 The settings here are general settings effecting emacs behaviour and appearance.
 
-### Window appearance ###
+### Window appearance <a name="Window-appearance" /> ###
 
 Most of these settings are for an uncluttered emacs experience.
 
@@ -141,7 +141,7 @@ We also want to disable the splash screen when we start emacs as it doesn't serv
 (setq inhibit-startup-message t)
 ```
 
-### Line numbering ###
+### Line numbering <a name="Line-numbering" /> ###
 
 Line numbering is also sometimes useful. At the moment it is off by default. I go through phases of wanting it and not wanting it. Hence at the moment it is commented out but it can be started on a per buffer basis with `M-x linum-mode` or globally with `M-x global-linum-mode`.
 
@@ -151,7 +151,7 @@ Line numbering is also sometimes useful. At the moment it is off by default. I g
   (global-linum-mode -1))
 ```
 
-### Theme ###
+### Theme <a name="Theme" /> ###
 
 Here we load the color theme for emacs. I really enjoy the [base16 themes][]. 
 
@@ -164,7 +164,7 @@ First we add the `themes` directory to the load-path and then set the theme. The
 (load-theme 'base16-brewer-light :no-confirm)
 ```
 
-### Font ###
+### Font <a name="Font" /> ###
 
 Change the default font to Menlo. Ideally I should check that this is actually installed but I haven't got around to doing this.
 
@@ -172,7 +172,7 @@ Change the default font to Menlo. Ideally I should check that this is actually i
 (add-to-list 'default-frame-alist '(font . "Menlo-12"))
 ```
 
-### Mode line ###
+### Mode line <a name="Mode-line" /> ###
 
 The default mode line is ugly and cluttered. [Smart-mode-line][] is a nice solution which make the mode line a bit more readable. There are light and dark themes but I like to use respectful which respects my current choice of color theme. The variable `sml/hidden-modes` takes a regex argument and hides all matching minor modes, since I don't want to see any minor modes I hide them all.
 
@@ -188,7 +188,7 @@ The default mode line is ugly and cluttered. [Smart-mode-line][] is a nice solut
     (sml/setup)))
 ```
 
-## Emacs behaviour ##
+## Emacs behaviour <a name="Emacs-behaviour" /> ##
 
 The following are just some settings affecting the general behaviou of emacs.
 
@@ -199,7 +199,7 @@ The bell is annoying so we turn it off.
 ```
 
 
-### Backups and autosaves ###
+### Backups and autosaves <a name="Backups-and-autosaves" /> ###
 
 The way emacs handles backup file is annoying also. It saves a file ending in `"~"`. We could just turn this off but Almost certaily I will regret this at some point when I loose some data. Hence we just stick all backups in a directory `~/.emacs.d/backups` and the same with autosave files in `~/.emacs.d/autosaves`. We also turn on version control so we keep a number of backup files.
 
@@ -215,7 +215,7 @@ The way emacs handles backup file is annoying also. It saves a file ending in `"
       version-control t)
 ```
 
-### Command history ###
+### Command history <a name="Command-history" /> ###
 
 Saving command history across emacs sessions is really useful. History is saved to the `~/.emacs.d/history` file. Note that it is important to have `savehist-mode` activated after costomising `savehist-file` (which I haven't done here), otherwise the history is cleared.
 
@@ -231,7 +231,7 @@ Saving command history across emacs sessions is really useful. History is saved 
 )
 ```
 
-### Save place in file ###
+### Save place in file <a name="Save-place-in-file" /> ###
 
 It is very useful for emacs to save the place of the cursor in the file so that when we open it back up again we return to the last position we were editing. To to this we use [saveplace][]. The buffer-local variable `save-place` can be set globally using `setq-default` so this is what we do. The list of places is kept in a file of the same name.
 
@@ -247,7 +247,7 @@ It is very useful for emacs to save the place of the cursor in the file so that 
 
 
 
-### Indentation and tabs ###
+### Indentation and tabs <a name="Indentation-and-tabs" /> ###
 
 Tab characters are annoying so we turn them off and make sure the default indent is 4 spaces. We also bind the return key to newline and indent.
 
@@ -257,7 +257,7 @@ Tab characters are annoying so we turn them off and make sure the default indent
 (global-set-key (kbd "RET") 'newline-and-indent)
 ```
 
-### Windmove ###
+### Windmove <a name="Windmove" /> ###
 
 [Windmove][] is a mode that lets you move buffers with `Shift-<arrow>` which is much easier than `C-x o`. This conflicts with `markdown-promote` but I don't use this often enough to car. Requiring windmove gives access to the functions `windmove-up` etc but the command `windmove-default-keybindings` sets the `Shift-<arrow>` bindings.
 
@@ -273,7 +273,7 @@ I also bind `C-x C-b` to `buffer-menu`instead of `buffer-list`.
   (windmove-default-keybindings))
 ```
 
-### Recent files ###
+### Recent files <a name="Recent-files" /> ###
 
 Maintain a list of recent files using [recentf-mode][]. This is fairly self explanitory. We access the list using `C-x C-r`. This conflicts with open read only but I have no use for this.
 
@@ -293,7 +293,7 @@ I would like the file where recentf keeps its records to be in my .emacs.d/ dire
     ))
 ```
 
-### Undo-tree ###
+### Undo-tree <a name="Undo-tree" /> ###
 
 Emacs' undo function isn't the most intuitive or easy to use. I like using [undo-tree-mode][] which replaces the keybinding `C-x u` and calls a graphical interface to navigating undo's and redo's in a tree structure.
 
@@ -305,7 +305,7 @@ Emacs' undo function isn't the most intuitive or easy to use. I like using [undo
   (global-undo-tree-mode))
 ```
 
-### Line breaking  ###
+### Line breaking  <a name="Line-breaking " /> ###
 
 Almost always I want lines to break at words rather than half way through a word. [Visual-line-mode][] acheives this nicely.
 
@@ -315,7 +315,7 @@ Almost always I want lines to break at words rather than half way through a word
 (global-visual-line-mode 1)
 ```
 
-### Browse kill ring ###
+### Browse kill ring <a name="Browse-kill-ring" /> ###
 
 This turns on a handy package to browse the kill ring. it is called with `browse-kill-ring` which is bound to `C-c C-y`.
 
@@ -325,7 +325,7 @@ This turns on a handy package to browse the kill ring. it is called with `browse
   )
 ```
 
-### Spelling ###
+### Spelling <a name="Spelling" /> ###
 
 The package [flyspell][] enables on-the-fly spell checking. It is fairly intelligent and ignores latex commands etc. my default keybinding to correct the word at point is `C-'`.
 
@@ -346,7 +346,7 @@ We also make sure flyspell starts by default in LaTeX and markdown modes.
 
 
 
-### Popwin ###
+### Popwin <a name="Popwin" /> ###
 
 [Popwin][] manages popup buffers such as `*Completions*`.
 
@@ -359,11 +359,11 @@ We also make sure flyspell starts by default in LaTeX and markdown modes.
 ```
 
 
-## Editing ##
+## Editing <a name="Editing" /> ##
 
 In this section I load packages useful for general editing
 
-### Auto-complete ###
+### Auto-complete <a name="Auto-complete" /> ###
 
 For global auto-completion I use [auto-complete-mode][]. The function `ac-config-default` sets sane default setting for auto-complete, inclusing starting automatically for certain modes such as emacs-lisp-mode.
 
@@ -391,7 +391,7 @@ The modes for which auto-complete will start automatically for are defined in th
   (load "~/.emacs.d/ac-ignores"))
 ```
 
-### Smartparens ###
+### Smartparens <a name="Smartparens" /> ###
 
 [Smartparens-mode][] is a mode for intelligent parenthesis (and other pairs) matching. It is ver extensible and you can define your own pairs. It has some nifty navigation commands which I should learn at some point and make key bindings for.
 
@@ -406,7 +406,7 @@ To define custom pairs the syntax at its most basic is `(sp-local-pair MODE "LEF
 ```
 
 
-### Expand region ###
+### Expand region <a name="Expand-region" /> ###
 
 Selecting regions intelligently is very useful, [Expand region][] allows to to incrementally increas and decrease the region selected in a smart way. Because this is so useful I have bound `er/expand-region` to `C-=` and `er/contract-region` to `C-+`. This is not intuitive.
 
@@ -419,7 +419,7 @@ Selecting regions intelligently is very useful, [Expand region][] allows to to i
    ("C-+" . er/contract-region)))
 ```
 
-### Yasnippet ###
+### Yasnippet <a name="Yasnippet" /> ###
 
 [Yasnippet][] is a template system. I use it mostly with LaTeX. Personal snippets are saved in `~/.emacs.d/snippets`, this is the default place.
 
@@ -431,7 +431,7 @@ Selecting regions intelligently is very useful, [Expand region][] allows to to i
   (yas-global-mode 1))
 ```
 
-## Markdown ##
+## Markdown <a name="Markdown" /> ##
 
 I use  [markdown-mode+][], which is an extension of [markdown-mode][]. 
 
@@ -445,11 +445,11 @@ I use  [markdown-mode+][], which is an extension of [markdown-mode][].
 ```
 
 
-## LaTeX ##
+## LaTeX <a name="LaTeX" /> ##
 
 Since I am a mathematician I use latex a lot hence lots of configuration to do.
 
-### AUCTeX ###
+### AUCTeX <a name="AUCTeX" /> ###
 
 [AUCTeX][] is the major mode for editing LaTeX files. Here I first make sure that emacs recognises XeLaTeX and has latex in its load path. Then I load various sources for auto-complete. I also set up some default environments which I use a lot and have it load the `ac-math` and `auto-complete-auctex` packages.
 
@@ -512,7 +512,7 @@ The packages [ac-math][] and [auto-complete-auctex][] add auto-complet sources f
 
 
 
-### RefTeX ###
+### RefTeX <a name="RefTeX" /> ###
 
 
 [RefTeX][] is a reference and citation manager for AUCTeX. I set `reftex-plug-into-AUCTeX` so that it behaves well with AUCTeX, setting `reftex-ref-macro-prompt` to `nil` gets rid of the annoying prompt when seaching for references and setting `reftex-bibliography-commands` allows me to use the `\addbibresource` command in my LaTeX documents. `reftex-label-alist` gives me quick access to looking for specific evironments to reference.
@@ -546,11 +546,11 @@ The packages [ac-math][] and [auto-complete-auctex][] add auto-complet sources f
 
 
 
-## Programming ##
+## Programming <a name="Programming" /> ##
 
 Mode specific to programming languages.
 
-### Magma ###
+### Magma <a name="Magma" /> ###
 
 Magma is a computer algebra package, the package [magma-mode][] provides syntax highlighting and indentation as well as the ability to interact with a magma process.
 
@@ -563,7 +563,7 @@ Magma is a computer algebra package, the package [magma-mode][] provides syntax 
   (add-to-list 'load-path "~/.emacs.d/site-lisp/magma-mode"))
 ```
 
-### Haskell ###
+### Haskell <a name="Haskell" /> ###
 
 Here I load Haskell mode. At the moment there is no fancy configuration.
 
@@ -578,7 +578,7 @@ Here I load Haskell mode. At the moment there is no fancy configuration.
 ```
 
 
-### Python ###
+### Python <a name="Python" /> ###
 
 I want to load python when I am editting sage files
 
@@ -590,7 +590,7 @@ I want to load python when I am editting sage files
 
 
 
-## Multiple major modes ##
+## Multiple major modes <a name="Multiple-major-modes" /> ##
 
 Often it is useful to have mutliple major modes in a single buffer. This markdown file is an example. I want to be able to edit the markdown in markdown-mode and the elisp in emacs-lisp-mode. To achieve this I use [mmm-mode][].
 
@@ -665,7 +665,7 @@ The only problem I have experienced with this is that indentation does not seem 
 			   ))
 ```
 
-## Key bindings ##
+## Key bindings <a name="Key-bindings" /> ##
 
 ```emacs-lisp
 
