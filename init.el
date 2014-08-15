@@ -5,6 +5,7 @@
 (setq use-package-verbose t
       use-package-idle-interval 10)
 (use-package paradox
+  :defer t
   :config
   (setq paradox-github-token t))
 ; (setq default-frame-alist '((top + 0) 
@@ -28,6 +29,7 @@
           sml/hidden-modes "\\([A-z]\\|[-]\\)*")
     (sml/setup)))
 (setq ring-bell-function 'ignore)
+(delete-selection-mode)
 (setq backup-by-copying t 
       backup-directory-alist
       '((".*" . "~/.emacs.d/backups")) 
@@ -55,12 +57,9 @@
 (setq-default indent-tabs-mode nil)
 (global-set-key (kbd "RET") 'newline-and-indent)
 (use-package windmove
-  :bind
-  ("C-x C-b" . buffer-menu)
   :init
   (windmove-default-keybindings))
 (use-package recentf
-  :bind ("C-x C-r" . recentf-open-files)
   :init
   (progn
     (setq recentf-save-file "~/.emacs.d/.recentf")
@@ -90,28 +89,27 @@
   :bind (("M-x" . helm-M-x)
          ("M-y" . helm-show-kill-ring)
          ("C-x b" . helm-mini)
-         ("C-x C-f" . helm-find-files))
+         ("C-x C-f" . helm-find-files)
+         ("C-x C-b" . helm-buffers-list)
+         ("C-x C-r" . helm-recentf))
   :init
   (progn
     (require 'helm-config)
+    (setq helm-mode-reverse-history nil)
     (helm-mode 1))
   )
-(use-package auto-complete-config
-  :config
-  (progn
-    (ac-config-default)
-    (setq ac-use-fuzzy t
-          ac-auto-start 2
-          ac-trigger-key "TAB"
-          ac-use-menu-map t)
-    (ac-flyspell-workaround)
-    (add-to-list 'ac-modes 'markdown-mode)
-    (add-to-list 'ac-modes 'LaTeX-mode))
-  :idle
-  (load "~/.emacs.d/ac-ignores"))
+(use-package company
+  :init (add-hook 'after-init-hook 'global-company-mode)
+  :config (progn
+            (bind-key "C-n" 'company-select-next company-active-map)
+            (bind-key "C-p" 'company-select-previous company-active-map)
+            ))
 (use-package smartparens
   :init
-  (smartparens-global-mode t))
+  (progn
+    (sp-pair "'" nil :actions :rem)
+    (smartparens-global-mode t))
+)
 (use-package expand-region
   :bind
   (("C-=" . er/expand-region)
@@ -122,29 +120,25 @@
 (use-package markdown-mode
 			 :mode "\\.md\\'")
 (use-package tex-site
+  :defer t
   :config
   (progn
     (setq TeX-engine 'xetex
           TeX-view-program-list '(("Preview" "open %o"))
-          exec-path (append exec-path '("/usr/texbin"))
-          ac-source (append '( ac-source-math-latex 
-                               ac-source-latex-commands
-                               ac-source-math-unicode
-                               ac-source-yasnippet)
-                            ac-sources))
+          exec-path (append exec-path '("/usr/texbin")))
     (setenv "TEXINPUTS" ".:~/latex:")
     (setenv "PATH" (concat (getenv "PATH") ":/usr/texbin")))
-  :idle
+  :init
   (progn
     (add-hook 'LaTeX-mode-hook 
               (lambda() 
                 (add-to-list 
                  'TeX-command-list 
                  '("XeLaTeX" "%`xelatex%(mode) --shell-escape%' %t" 
-                   TeX-run-TeX nil t)) 
+                   TeX-run-TeX nil t))))
                 (setq TeX-command-default "XeLaTeX"
                       TeX-save-query nil 
-                      TeX-show-compilation nil)))
+                      TeX-show-compilation nil)
     (add-hook 'LaTeX-mode-hook
               (lambda ()
                 (LaTeX-add-environments
@@ -160,10 +154,10 @@
                  '("Remark" LaTeX-env-label)
                  '("Problem" LaTeX-env-label)
                  )))
-    (use-package ac-math)
-    (use-package auto-complete-auctex)
+    (company-auctex-init)
     ))
 (use-package reftex
+  :defer t
   :config
   (setq reftex-plug-into-AUCTeX t
         reftex-ref-macro-prompt nil
@@ -197,55 +191,55 @@
   :mode "\\.sage\\'"
   )
 (use-package mmm-auto
-			 :init
-			 (progn
-			   (setq mmm-global-mode 'maybe)
-			   (defvar mmm-markdown-mode-alist '())
-			   (defun mmm-markdown-get-mode (string)
-				 (string-match "[a-zA-Z_-]+" string)
-				 (setq string (match-string 0 string))
-				 (or (mmm-ensure-modename
-					  ;; First try the user override variable.
-					  (some #'(lambda (pair)
-								(if (string-match (car pair) string) (cdr pair) nil))
-							mmm-markdown-mode-alist))
-					 (let ((words (split-string (downcase string) "[_-]+")))
-					   (or (mmm-ensure-modename
-							;; Try the whole name, stopping at "mode" if present.
-							(intern
-							 (mapconcat #'identity
-										(nconc (ldiff words (member "mode" words))
-											   (list "mode"))
-										"-")))
-						   ;; Try each word by itself (preference list)
-						   (some #'(lambda (word)
-									 (mmm-ensure-modename (intern word)))
-								 words)
-						   ;; Try each word with -mode tacked on
-						   (some #'(lambda (word)
-									 (mmm-ensure-modename
-									  (intern (concat word "-mode"))))
-								 words)
-						   ;; Try each pair of words with -mode tacked on
-						   (loop for (one two) on words
-								 if (mmm-ensure-modename
-									 (intern (concat one two "-mode")))
-								 return it)
-						   ;; I'm unaware of any modes whose names, minus `-mode',
-						   ;; are more than two words long, and if the entire mode
-						   ;; name (perhaps minus `-mode') doesn't occur in the
-						   ;; markdownument name, we can give up.
-						   (signal 'mmm-no-matching-submode nil)))))
-			   (mmm-add-classes
-				'((markdown
-				   :front "```+\\([a-zA-Z0-9_-]+\\)"
-				   :front-offset (end-of-line 1)
-				   :back "```+[ ]*$"
-				   :save-matches 1
-				   :delimiter-mode nil
-				   :match-submode mmm-markdown-get-mode
-				   :end-not-begin t
-				   )))
-			   (mmm-add-mode-ext-class 'markdown-mode "\\.md\\'" 'markdown)
-			   ))
+			  :init
+			  (progn
+			    (setq mmm-global-mode 'maybe)
+			    (defvar mmm-markdown-mode-alist '())
+			    (defun mmm-markdown-get-mode (string)
+			      (string-match "[a-zA-Z_-]+" string)
+			      (setq string (match-string 0 string))
+			      (or (mmm-ensure-modename
+			     	  ;; First try the user override variable.
+			     	  (some #'(lambda (pair)
+			     				(if (string-match (car pair) string) (cdr pair) nil))
+			     			mmm-markdown-mode-alist))
+			     	 (let ((words (split-string (downcase string) "[_-]+")))
+			     	   (or (mmm-ensure-modename
+			     			;; Try the whole name, stopping at "mode" if present.
+			     			(intern
+			     			 (mapconcat #'identity
+			     						(nconc (ldiff words (member "mode" words))
+			     							   (list "mode"))
+			     						"-")))
+			     		   ;; Try each word by itself (preference list)
+			     		   (some #'(lambda (word)
+			     					 (mmm-ensure-modename (intern word)))
+			     				 words)
+			     		   ;; Try each word with -mode tacked on
+			     		   (some #'(lambda (word)
+			     					 (mmm-ensure-modename
+			     					  (intern (concat word "-mode"))))
+			     				 words)
+			     		   ;; Try each pair of words with -mode tacked on
+			     		   (loop for (one two) on words
+			     				 if (mmm-ensure-modename
+			     					 (intern (concat one two "-mode")))
+			     				 return it)
+			     		   ;; I'm unaware of any modes whose names, minus `-mode',
+			     		   ;; are more than two words long, and if the entire mode
+			     		   ;; name (perhaps minus `-mode') doesn't occur in the
+			     		   ;; markdownument name, we can give up.
+			     		   (signal 'mmm-no-matching-submode nil)))))
+			    (mmm-add-classes
+			     '((markdown
+			        :front "```+\\([a-zA-Z0-9_-]+\\)"
+			        :front-offset (end-of-line 1)
+			        :back "```+[ ]*$"
+			        :save-matches 1
+			        :delimiter-mode nil
+			        :match-submode mmm-markdown-get-mode
+			        :end-not-begin t
+			        )))
+			    (mmm-add-mode-ext-class 'markdown-mode "\\.md\\'" 'markdown)
+			    ))
 
