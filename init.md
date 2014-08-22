@@ -23,6 +23,7 @@
     - [Spelling](#Spelling)
     - [Popwin](#Popwin)
     - [Helm](#Helm)
+    - [Ace-jump](#Ace-jump)
 - [Editing](#Editing)
     - [Company](#Company)
     - [Smartparens](#Smartparens)
@@ -381,9 +382,22 @@ I set `helm-mode-reverse-history` to `nil` as otherwise the history of whatever 
   (progn
     (require 'helm-config)
     (setq helm-mode-reverse-history nil)
-    (helm-mode 1))
+    (helm-mode 1)
+    (setq helm-locate-command "mdfind -onlyin $HOME -name %s %s | grep -v \"$HOME/Library\" "))
   )
 ```
+
+### Ace-jump <a name="Ace-jump" /> ###
+
+[Ace-jump-mode][] is a minor mode for jumping around the buffer. The way it works is, find the word you want to jump to the start of. Call `ace-jump-mode`, this asks for the `Head char`, i.e. the first character of the word. When entered, this will change the first character of the word you want to move to, to a red letter. Type this letter and you will be magically transported there!
+
+[Ace-jump-mode]: https://github.com/winterTTr/ace-jump-mode
+
+```emacs-lisp
+(use-package ace-jump-mode
+  :bind ("C-c SPC" . ace-jump-mode))
+```
+
 
 
 ## Editing <a name="Editing" /> ##

@@ -96,8 +96,11 @@
   (progn
     (require 'helm-config)
     (setq helm-mode-reverse-history nil)
-    (helm-mode 1))
+    (helm-mode 1)
+    (setq helm-locate-command "mdfind -onlyin $HOME -name %s %s | grep -v \"$HOME/Library\" "))
   )
+(use-package ace-jump-mode
+  :bind ("C-c SPC" . ace-jump-mode))
 (use-package company
   :init (add-hook 'after-init-hook 'global-company-mode)
   :config (progn
