@@ -5,13 +5,13 @@
 (setq use-package-verbose t
       use-package-idle-interval 10)
 (use-package paradox
-  :defer t
+;;  :defer t
   :config
   (setq paradox-github-token t))
-; (setq default-frame-alist '((top + 0) 
-; 			    (left + 0) 
-; 			    (height . 82) 
-; 			    (width . 179)))
+(setq default-frame-alist '((top + 100) 
+			    (left + 100) 
+			    (height . 62) 
+			    (width . 120)))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (setq inhibit-startup-message t)
@@ -19,14 +19,14 @@
   :init
   (global-linum-mode -1))
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-(load-theme 'base16-brewer-light :no-confirm)
+(load-theme 'base16-eighties-dark :no-confirm)
 (add-to-list 'default-frame-alist '(font . "Menlo-12"))
 (use-package smart-mode-line
   :config
   (progn
     (load-theme 'smart-mode-line-respectful :no-confirm)
     (setq sml/theme nil
-          sml/hidden-modes "\\([A-z]\\|[-]\\)*")
+          rm-blacklist "\\([A-z]\\|[-]\\)*")
     (sml/setup)))
 (setq ring-bell-function 'ignore)
 (delete-selection-mode)
@@ -64,7 +64,7 @@
   (progn
     (setq recentf-save-file "~/.emacs.d/.recentf")
     (recentf-mode t)
-    (setq recentf-max-menu-items 25)
+    (setq recentf-max-menu-items 50)
     (add-to-list 'recentf-exclude "\\.emacs.d/.cask/")
     ))
 (use-package undo-tree
@@ -107,19 +107,46 @@
             (bind-key "C-n" 'company-select-next company-active-map)
             (bind-key "C-p" 'company-select-previous company-active-map)
             ))
-(use-package smartparens
+(use-package smartparens-config
+  ; :bind (("C-M-f" . 'sp-forward-sexp)
+  ; ("C-M-b" . 'sp-backward-sexp)
+  ; ("C-M-d" . 'sp-down-sexp)
+  ; ("C-M-a" . 'sp-backward-down-sexp)
+  ; ("C-S-a" . 'sp-beginning-of-sexp)
+  ; ("C-S-d" . 'sp-end-of-sexp)
+  ; ("C-M-e" . 'sp-up-sexp)
+  ; ("C-M-u" . 'sp-backward-up-sexp)
+  ; ("C-M-t" . 'sp-transpose-sexp)
+  ; ("C-M-n" . 'sp-next-sexp)
+  ; ("C-M-p" . 'sp-previous-sexp)
+  ; ("C-M-k" . 'sp-kill-sexp)
+  ; ("C-M-w" . 'sp-copy-sexp))
   :init
   (progn
-    (sp-pair "'" nil :actions :rem)
-    (smartparens-global-mode t))
+    (smartparens-global-mode t)
+    (show-smartparens-global-mode t)
+    (sp-use-smartparens-bindings)
+    (sp-pair "\\(" nil :actions :rem)
+    (sp-pair "\\( " " \\)" :trigger "\\(")
+    (sp-local-pair 'latex-mode "\\left| " " \\right|" :trigger "\\l|")
+    (sp-local-pair 'latex-mode "\\left( " " \\right)" :trigger "\\l(")
+    (sp-local-pair 'latex-mode "\\left{ " " \\right}" :trigger "\\l{")
+    )
 )
 (use-package expand-region
   :bind
   (("C-=" . er/expand-region)
    ("C-+" . er/contract-region)))
 (use-package yasnippet
-  :idle
-  (yas-global-mode 1))
+  :init
+  (yas-reload-all))
+(use-package projectile
+  :init
+  (projectile-global-mode)
+  :config
+  (setq projectile-completion-system 'helm))
+
+(use-package helm-projectile)
 (use-package markdown-mode
 			 :mode "\\.md\\'")
 (use-package tex-site
@@ -127,7 +154,6 @@
   :config
   (progn
     (setq TeX-engine 'xetex
-          TeX-view-program-list '(("Preview" "open %o"))
           exec-path (append exec-path '("/usr/texbin")))
     (setenv "TEXINPUTS" ".:~/latex:")
     (setenv "PATH" (concat (getenv "PATH") ":/usr/texbin")))
@@ -137,11 +163,12 @@
               (lambda() 
                 (add-to-list 
                  'TeX-command-list 
-                 '("XeLaTeX" "%`xelatex%(mode) --shell-escape%' %t" 
-                   TeX-run-TeX nil t))))
-                (setq TeX-command-default "XeLaTeX"
+                 '("XeLaTeX" "%`xelatex%(mode) --shell-escape%' %t" TeX-run-TeX nil t))))
+    (add-hook 'LaTeX-mode-hook
+              (lambda ()
+                (setq TeX-command-default "LaTexMk"
                       TeX-save-query nil 
-                      TeX-show-compilation nil)
+                      TeX-show-compilation nil)))
     (add-hook 'LaTeX-mode-hook
               (lambda ()
                 (LaTeX-add-environments
@@ -157,8 +184,30 @@
                  '("Remark" LaTeX-env-label)
                  '("Problem" LaTeX-env-label)
                  )))
+    (add-hook 'LaTeX-mode-hook
+              (lambda ()
+                  (add-to-list 'LaTeX-label-alist '("Theorem" . "thm:"))
+                  (add-to-list 'LaTeX-label-alist '("Lemma" . "lem:"))
+                  (add-to-list 'LaTeX-label-alist '("Proposition" . "prp"))
+                  (add-to-list 'LaTeX-label-alist '("Definition" . "def:"))
+                  (add-to-list 'LaTeX-label-alist '("Example" . "exm:"))
+                  (add-to-list 'LaTeX-label-alist '("Exercise" . "exr:"))
+                  (add-to-list 'LaTeX-label-alist '("Conjecture" . "coj:"))
+                  (add-to-list 'LaTeX-label-alist '("Corollary" . "cor:"))
+                  (add-to-list 'LaTeX-label-alist '("Remark" . "rem:"))
+                  (add-to-list 'LaTeX-label-alist '("Problem" . "prb:"))))
+    (add-hook 'LaTeX-mode-hook
+              (lambda ()
+                (yas-minor-mode)))
+    (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+    (setq reftex-plug-into-AUCTeX t)
     (company-auctex-init)
+    (flyspell-mode)
     ))
+
+(use-package auctex-latexmk
+  :init (auctex-latexmk-setup)
+  )
 (use-package reftex
   :defer t
   :config
@@ -167,13 +216,14 @@
         reftex-bibliography-commands '("bibliography"
                                        "nobibliography"
                                        "addbibresource")
+        reftex-insert-label-flags '(t t)
         reftex-label-alist
-        '(("Theorem" ?h "thm:" "~\\ref{%s}" t ("Theorem" "thm."))
+        '(("Theorem" ?h "thm:" "~\\ref{%s}" nil ("Theorem" "thm."))
           ("Lemma" ?l "lem:" "~\\ref{%s}" t ("Lemma" "lem."))
           ("Proposition" ?p "prp:" "~\\ref{%s}" t ("Proposition" "prp."))
           ("Definition" ?d "def:" "~\\ref{%s}" t ("Definition" "def."))
           ("Example" ?x "exm:" "~\\ref{%s}" t ("Example" "exm."))
-          ("Exercise" ?s "ecs:" "~\\ref{%s}" t ("Exercise" "ecs."))
+          ("Exercise" ?E "exr:" "~\\ref{%s}" t ("Exercise" "exr."))
           ("Conjecture" ?C "coj:" "~\\ref{%s}" t ("Conjecture" "coj."))
           ("Corollary" ?c "cor:" "~\\ref{%s}" t ("Corollary" "cor."))
           ("Remark" ?r "rem:" "~\\ref{%s}" t ("Remark" "rem."))
@@ -190,7 +240,7 @@
     (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
     (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
     ))
-(use-package python-mode
+(use-package python
   :mode "\\.sage\\'"
   )
 (use-package mmm-auto
@@ -245,4 +295,16 @@
 			        )))
 			    (mmm-add-mode-ext-class 'markdown-mode "\\.md\\'" 'markdown)
 			    ))
-
+(server-start)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(paradox-github-token t))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

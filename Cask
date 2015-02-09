@@ -3,6 +3,7 @@
 (source melpa)
 
 (depends-on "ace-jump-mode")
+(depends-on "async")
 (depends-on "auctex")
 (depends-on "bind-key")
 (depends-on "cask")
@@ -29,6 +30,7 @@
 (depends-on "paradox")
 (depends-on "popup")
 (depends-on "popwin")
+(depends-on "python-mode")
 (depends-on "rich-minority")
 (depends-on "s")
 (depends-on "shut-up")
@@ -36,4 +38,3 @@
 (depends-on "smartparens")
 (depends-on "undo-tree")
 (depends-on "use-package")
-(depends-on "yasnippet")

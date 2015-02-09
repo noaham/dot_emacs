@@ -29,6 +29,7 @@
     - [Smartparens](#Smartparens)
     - [Expand region](#Expand-region)
     - [Yasnippet](#Yasnippet)
+    - [Projectile](#Projectile)
 - [Markdown](#Markdown)
 - [LaTeX](#LaTeX)
     - [AUCTeX](#AUCTeX)
@@ -57,9 +58,8 @@ This init file assumes that some directories exist such as `~/.emacs.d/snippets`
 
 TODO:
 
-+ Learn and implement keybindings for smartparens movement commands
-+ tone down the greys in the base16-brewer-light theme
-+ configure mmm-mode so that I can simply write elisp instead of emacs-lisp next to fenced code blocks. This is desirable as github recognised applies syntax highlighting to blocks with the keyword elisp but not emacs-lisp. 
++ Tidy up auctex conifg
++ write color theme for company
 
 
 ## Package management <a name="Package-management" /> ##
@@ -106,7 +106,7 @@ It is probably best to see the use-package website or below for examples.
 
 ```emacs-lisp
 (use-package paradox
-  :defer t
+;;  :defer t
   :config
   (setq paradox-github-token t))
 ```
@@ -124,10 +124,10 @@ Most of these settings are for an uncluttered emacs experience.
 Emacs by default starts quite small. I used to change this so that it started reasonably large (left two thirds of the screen) however i usually use it in full screen mode now so I have commented it out.
 
 ```emacs-lisp
-; (setq default-frame-alist '((top + 0) 
-; 			    (left + 0) 
-; 			    (height . 82) 
-; 			    (width . 179)))
+(setq default-frame-alist '((top + 100) 
+			    (left + 100) 
+			    (height . 62) 
+			    (width . 120)))
 ```
 
 We do not need tool bars or scroll bars so we turn them off.
@@ -163,7 +163,7 @@ First we add the `themes` directory to the load-path and then set the theme. The
 
 ```emacs-lisp
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-(load-theme 'base16-brewer-light :no-confirm)
+(load-theme 'base16-eighties-dark :no-confirm)
 ```
 
 ### Font <a name="Font" /> ###
@@ -186,7 +186,7 @@ The default mode line is ugly and cluttered. [Smart-mode-line][] is a nice solut
   (progn
     (load-theme 'smart-mode-line-respectful :no-confirm)
     (setq sml/theme nil
-          sml/hidden-modes "\\([A-z]\\|[-]\\)*")
+          rm-blacklist "\\([A-z]\\|[-]\\)*")
     (sml/setup)))
 ```
 
@@ -291,7 +291,7 @@ I would like the file where recentf keeps its records to be in my .emacs.d/ dire
   (progn
     (setq recentf-save-file "~/.emacs.d/.recentf")
     (recentf-mode t)
-    (setq recentf-max-menu-items 25)
+    (setq recentf-max-menu-items 50)
     (add-to-list 'recentf-exclude "\\.emacs.d/.cask/")
     ))
 ```
@@ -433,11 +433,31 @@ To define custom pairs the syntax at its most basic is `(sp-local-pair MODE "LEF
 [Smartparens-mode]: https://github.com/Fuco1/smartparens
 
 ```emacs-lisp
-(use-package smartparens
+(use-package smartparens-config
+  ; :bind (("C-M-f" . 'sp-forward-sexp)
+  ; ("C-M-b" . 'sp-backward-sexp)
+  ; ("C-M-d" . 'sp-down-sexp)
+  ; ("C-M-a" . 'sp-backward-down-sexp)
+  ; ("C-S-a" . 'sp-beginning-of-sexp)
+  ; ("C-S-d" . 'sp-end-of-sexp)
+  ; ("C-M-e" . 'sp-up-sexp)
+  ; ("C-M-u" . 'sp-backward-up-sexp)
+  ; ("C-M-t" . 'sp-transpose-sexp)
+  ; ("C-M-n" . 'sp-next-sexp)
+  ; ("C-M-p" . 'sp-previous-sexp)
+  ; ("C-M-k" . 'sp-kill-sexp)
+  ; ("C-M-w" . 'sp-copy-sexp))
   :init
   (progn
-    (sp-pair "'" nil :actions :rem)
-    (smartparens-global-mode t))
+    (smartparens-global-mode t)
+    (show-smartparens-global-mode t)
+    (sp-use-smartparens-bindings)
+    (sp-pair "\\(" nil :actions :rem)
+    (sp-pair "\\( " " \\)" :trigger "\\(")
+    (sp-local-pair 'latex-mode "\\left| " " \\right|" :trigger "\\l|")
+    (sp-local-pair 'latex-mode "\\left( " " \\right)" :trigger "\\l(")
+    (sp-local-pair 'latex-mode "\\left{ " " \\right}" :trigger "\\l{")
+    )
 )
 ```
 
@@ -457,14 +477,30 @@ Selecting regions intelligently is very useful, [Expand region][] allows to to i
 
 ### Yasnippet <a name="Yasnippet" /> ###
 
-[Yasnippet][] is a template system. I use it mostly with LaTeX. Personal snippets are saved in `~/.emacs.d/snippets`, this is the default place.
+[Yasnippet][] is a template system. I use it mostly with LaTeX. Personal snippets are saved in `~/.emacs.d/snippets`, this is the default place. I have stoped using yassnippet as the benifit I get from it is minimal and it is very bulky, hence the seetings are commented out.
 
 [Yasnippet]: https://github.com/capitaomorte/yasnippet
 
 ```emacs-lisp
 (use-package yasnippet
-  :idle
-  (yas-global-mode 1))
+  :init
+  (yas-reload-all))
+```
+
+### Projectile <a name="Projectile" />  ###
+
+[Projectile][] is a project interaction library for emacs.
+
+[Projectile]: https://github.com/bbatsov/projectile
+
+```emacs-lisp
+(use-package projectile
+  :init
+  (projectile-global-mode)
+  :config
+  (setq projectile-completion-system 'helm))
+
+(use-package helm-projectile)
 ```
 
 ## Markdown <a name="Markdown" /> ##
@@ -506,7 +542,6 @@ I used to use [ac-math][] and [auto-complete-auctex][] to add auto-complete sour
   :config
   (progn
     (setq TeX-engine 'xetex
-          TeX-view-program-list '(("Preview" "open %o"))
           exec-path (append exec-path '("/usr/texbin")))
     (setenv "TEXINPUTS" ".:~/latex:")
     (setenv "PATH" (concat (getenv "PATH") ":/usr/texbin")))
@@ -516,11 +551,12 @@ I used to use [ac-math][] and [auto-complete-auctex][] to add auto-complete sour
               (lambda() 
                 (add-to-list 
                  'TeX-command-list 
-                 '("XeLaTeX" "%`xelatex%(mode) --shell-escape%' %t" 
-                   TeX-run-TeX nil t))))
-                (setq TeX-command-default "XeLaTeX"
+                 '("XeLaTeX" "%`xelatex%(mode) --shell-escape%' %t" TeX-run-TeX nil t))))
+    (add-hook 'LaTeX-mode-hook
+              (lambda ()
+                (setq TeX-command-default "LaTexMk"
                       TeX-save-query nil 
-                      TeX-show-compilation nil)
+                      TeX-show-compilation nil)))
     (add-hook 'LaTeX-mode-hook
               (lambda ()
                 (LaTeX-add-environments
@@ -536,8 +572,30 @@ I used to use [ac-math][] and [auto-complete-auctex][] to add auto-complete sour
                  '("Remark" LaTeX-env-label)
                  '("Problem" LaTeX-env-label)
                  )))
+    (add-hook 'LaTeX-mode-hook
+              (lambda ()
+                  (add-to-list 'LaTeX-label-alist '("Theorem" . "thm:"))
+                  (add-to-list 'LaTeX-label-alist '("Lemma" . "lem:"))
+                  (add-to-list 'LaTeX-label-alist '("Proposition" . "prp"))
+                  (add-to-list 'LaTeX-label-alist '("Definition" . "def:"))
+                  (add-to-list 'LaTeX-label-alist '("Example" . "exm:"))
+                  (add-to-list 'LaTeX-label-alist '("Exercise" . "exr:"))
+                  (add-to-list 'LaTeX-label-alist '("Conjecture" . "coj:"))
+                  (add-to-list 'LaTeX-label-alist '("Corollary" . "cor:"))
+                  (add-to-list 'LaTeX-label-alist '("Remark" . "rem:"))
+                  (add-to-list 'LaTeX-label-alist '("Problem" . "prb:"))))
+    (add-hook 'LaTeX-mode-hook
+              (lambda ()
+                (yas-minor-mode)))
+    (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+    (setq reftex-plug-into-AUCTeX t)
     (company-auctex-init)
+    (flyspell-mode)
     ))
+
+(use-package auctex-latexmk
+  :init (auctex-latexmk-setup)
+  )
 ```
 
 
@@ -561,13 +619,14 @@ I used to use [ac-math][] and [auto-complete-auctex][] to add auto-complete sour
         reftex-bibliography-commands '("bibliography"
                                        "nobibliography"
                                        "addbibresource")
+        reftex-insert-label-flags '(t t)
         reftex-label-alist
-        '(("Theorem" ?h "thm:" "~\\ref{%s}" t ("Theorem" "thm."))
+        '(("Theorem" ?h "thm:" "~\\ref{%s}" nil ("Theorem" "thm."))
           ("Lemma" ?l "lem:" "~\\ref{%s}" t ("Lemma" "lem."))
           ("Proposition" ?p "prp:" "~\\ref{%s}" t ("Proposition" "prp."))
           ("Definition" ?d "def:" "~\\ref{%s}" t ("Definition" "def."))
           ("Example" ?x "exm:" "~\\ref{%s}" t ("Example" "exm."))
-          ("Exercise" ?s "ecs:" "~\\ref{%s}" t ("Exercise" "ecs."))
+          ("Exercise" ?E "exr:" "~\\ref{%s}" t ("Exercise" "exr."))
           ("Conjecture" ?C "coj:" "~\\ref{%s}" t ("Conjecture" "coj."))
           ("Corollary" ?c "cor:" "~\\ref{%s}" t ("Corollary" "cor."))
           ("Remark" ?r "rem:" "~\\ref{%s}" t ("Remark" "rem."))
@@ -616,7 +675,7 @@ Here I load Haskell mode. At the moment there is no fancy configuration.
 I want to load python when I am editting sage files
 
 ```emacs-lisp
-(use-package python-mode
+(use-package python
   :mode "\\.sage\\'"
   )
 ```
@@ -700,7 +759,7 @@ The only problem I have experienced with this is that indentation does not seem 
 ## Key bindings <a name="Key-bindings" /> ##
 
 ```emacs-lisp
-
+(server-start)
 ```
 
 

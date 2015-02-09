@@ -10,4 +10,9 @@ private.el
 history
 site-lisp/magma-mode/*
 .recentf
+.mc-lists.el
+eshell
+games
+projectile-bookmarks.eld
+speed-type
 
