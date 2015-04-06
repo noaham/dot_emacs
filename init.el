@@ -1,6 +1,7 @@
 (require 'cask)
 (cask-initialize)
 (require 'pallet)
+(pallet-mode t)
 (require 'use-package)
 (setq use-package-verbose t
       use-package-idle-interval 10)
@@ -79,12 +80,10 @@
   ("C-'" . ispell-word)
   :config
   (progn
+    (setq ispell-program-name "aspell")
     (setq ispell-dictionary "british")
     (add-hook 'LaTeX-mode-hook 'flyspell-mode)
     (add-hook 'markdown-mode-hook 'flyspell-mode)))
-(use-package popwin
-  :init
-  (popwin-mode 1))
 (use-package helm
   :bind (("M-x" . helm-M-x)
          ("M-y" . helm-show-kill-ring)
@@ -137,9 +136,7 @@
   :bind
   (("C-=" . er/expand-region)
    ("C-+" . er/contract-region)))
-(use-package yasnippet
-  :init
-  (yas-reload-all))
+(use-package yasnippet)
 (use-package projectile
   :init
   (projectile-global-mode)
@@ -231,7 +228,7 @@
         ))
 (use-package magma-mode
   :mode "\\.m\\'"
-  :pre-load
+  :init
   (add-to-list 'load-path "~/.emacs.d/site-lisp/magma-mode"))
 (use-package haskell-mode
   :mode "\\.hs\\'"
@@ -296,15 +293,3 @@
 			    (mmm-add-mode-ext-class 'markdown-mode "\\.md\\'" 'markdown)
 			    ))
 (server-start)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(paradox-github-token t))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )

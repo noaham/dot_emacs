@@ -74,6 +74,7 @@ The very first thing we do is set up [cask][] and [pallet][]. These two utilitie
 (require 'cask)
 (cask-initialize)
 (require 'pallet)
+(pallet-mode t)
 ```
     
 ### use-package <a name="use-package" /> ###
@@ -342,23 +343,10 @@ We also make sure flyspell starts by default in LaTeX and markdown modes.
   ("C-'" . ispell-word)
   :config
   (progn
+    (setq ispell-program-name "aspell")
     (setq ispell-dictionary "british")
     (add-hook 'LaTeX-mode-hook 'flyspell-mode)
     (add-hook 'markdown-mode-hook 'flyspell-mode)))
-```
-
-
-
-### Popwin <a name="Popwin" /> ###
-
-[Popwin][] manages popup buffers such as `*Completions*`.
-
-[Popwin]: https://github.com/m2ym/popwin-el
-
-```emacs-lisp
-(use-package popwin
-  :init
-  (popwin-mode 1))
 ```
 
 
@@ -482,9 +470,7 @@ Selecting regions intelligently is very useful, [Expand region][] allows to to i
 [Yasnippet]: https://github.com/capitaomorte/yasnippet
 
 ```emacs-lisp
-(use-package yasnippet
-  :init
-  (yas-reload-all))
+(use-package yasnippet)
 ```
 
 ### Projectile <a name="Projectile" />  ###
@@ -651,7 +637,7 @@ Magma is a computer algebra package, the package [magma-mode][] provides syntax 
 ```emacs-lisp
 (use-package magma-mode
   :mode "\\.m\\'"
-  :pre-load
+  :init
   (add-to-list 'load-path "~/.emacs.d/site-lisp/magma-mode"))
 ```
 
