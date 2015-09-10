@@ -22,7 +22,7 @@
     - [Spelling](#Spelling)
     - [Popwin](#Popwin)
     - [Helm](#Helm)
-    - [Ace-jump](#Ace-jump)
+    - [Avy](#Avy)
 - [Editing](#Editing)
     - [Company](#Company)
     - [Smartparens](#Smartparens)
@@ -70,6 +70,7 @@ The very first thing we do is set up [cask][] and [pallet][]. These two utilitie
 [pallet]: https://github.com/rdallasgray/pallet
 
 ```emacs-lisp
+(package-initialize)
 (require 'cask)
 (cask-initialize)
 (require 'pallet)
@@ -162,7 +163,8 @@ First we add the `themes` directory to the load-path and then set the theme. The
 
 ```emacs-lisp
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-(load-theme 'base16-eighties-dark :no-confirm)
+(load-theme 'mccarthy :no-confirm)
+;(load-theme 'base16-eighties-dark :no-confirm)
 ```
 
 ### Font <a name="Font" /> ###
@@ -170,19 +172,19 @@ First we add the `themes` directory to the load-path and then set the theme. The
 Change the default font to Menlo. Ideally I should check that this is actually installed but I haven't got around to doing this.
 
 ```emacs-lisp
-(add-to-list 'default-frame-alist '(font . "Menlo-12"))
+(add-to-list 'default-frame-alist '(font . "Menlo-12")) 
 ```
 
 ### Mode line <a name="Mode-line" /> ###
 
-The default mode line is ugly and cluttered. [Smart-mode-line][] is a nice solution which make the mode line a bit more readable. There are light and dark themes but I like to use respectful which respects my current choice of color theme. The variable `sml/hidden-modes` takes a regex argument and hides all matching minor modes, since I don't want to see any minor modes I hide them all.
+The default mode line is ugly and cluttered. [Smart-mode-line][] is a nice solution which make the mode line a bit more readable. There are light and dark themes but I like to use respectful which respects my current choice of color theme. The variable `sml/hidden-modes` takes a regex argument and hides all matching minor modes, since I don't want to see any minor modes I hide them all. 
 
 [Smart-mode-line]: https://github.com/Bruce-Connor/smart-mode-line
 
 ```emacs-lisp
 (use-package smart-mode-line
   :config
-  (load-theme 'smart-mode-line-respectful :no-confirm)
+;  (load-theme 'smart-mode-line-respectful :no-confirm)
   (setq sml/theme nil
         rm-blacklist "\\([A-z]\\|[-]\\)*")
   (sml/setup))
@@ -357,21 +359,38 @@ I set `helm-mode-reverse-history` to `nil` as otherwise the history of whatever 
   (setq helm-mode-reverse-history nil)
   (helm-mode 1)
   (setq helm-locate-command "mdfind -onlyin $HOME -name %s %s | grep -v \"$HOME/Library\" ")
+  (setq helm-truncate-lines t)
   )
 ```
 
-### Ace-jump <a name="Ace-jump" /> ###
+### Avy <a name="Avy" /> ###
 
-[Ace-jump-mode][] is a minor mode for jumping around the buffer. The way it works is, find the word you want to jump to the start of. Call `ace-jump-mode`, this asks for the `Head char`, i.e. the first character of the word. When entered, this will change the first character of the word you want to move to, to a red letter. Type this letter and you will be magically transported there!
+[Avy][] is a minor mode for jumping around the buffer. The way it works is, find the word you want to jump to the start of. Call `avy-goto-char`, this asks for the `char`, i.e. the character you want to jump to. When entered, this will change the character you want to move to, to a red letter. Type this letter and you will be magically transported there! If too many options exits, avy builds a tree which takes you there.
 
-[Ace-jump-mode]: https://github.com/winterTTr/ace-jump-mode
+The other functions `avy-goto-char2` and `avy-goto-line` work the same except for two chars and lines respectively.
+
+[Avy]: https://github.com/abo-abo/avy
 
 ```emacs-lisp
-(use-package ace-jump-mode
-  :bind ("C-c SPC" . ace-jump-mode)
+(use-package avy
+  :bind (("C-c SPC" . 'avy-goto-char)
+         ("C-c b" . 'avy-goto-char2)
+         ("M-c SPC" . 'avy-goto-line))
   )
 ```
 
+### Swiper-helm <a name-"Swiper-helm" /> ###
+
+[Swiper-helm][] is a minor mode which improves the standard regex search. It uses helm to show a list of options which you can choose from.
+
+[Swiper-helm]: https://github.com/abo-abo/swiper-helm
+
+```emacs-lisp
+(use-package swiper-helm
+  :bind (("C-s" . 'swiper-helm)
+         ("C-r" . 'swiper-helm))
+  )
+```
 
 
 ## Editing <a name="Editing" /> ##
@@ -427,6 +446,9 @@ To define custom pairs the syntax at its most basic is `(sp-local-pair MODE "LEF
   (sp-use-smartparens-bindings)
   (sp-pair "\\(" nil :actions :rem)
   (sp-pair "\\( " " \\)" :trigger "\\(")
+  (sp-pair "\\[ " " \\]" :trigger "\\[")
+  (sp-pair "\\\\( " " \\\\)" :trigger "\\\\(")
+  (sp-pair "\\\\[ " " \\\\]" :trigger "\\\\[")
   (sp-local-pair 'latex-mode "\\left| " " \\right|" :trigger "\\l|")
   (sp-local-pair 'latex-mode "\\left( " " \\right)" :trigger "\\l(")
   (sp-local-pair 'latex-mode "\\left{ " " \\right}" :trigger "\\l{")
@@ -625,8 +647,9 @@ Magma is a computer algebra package, the package [magma-mode][] provides syntax 
 ```emacs-lisp
 (use-package magma-mode
   :mode "\\.m\\'"
-  :init
-  (add-to-list 'load-path "~/.emacs.d/site-lisp/magma-mode"))
+  ; :init
+  ; (add-to-list 'load-path "~/.emacs.d/site-lisp/magma-mode")
+  )
 ```
 
 ### Haskell <a name="Haskell" /> ###
@@ -648,8 +671,11 @@ Here I load Haskell mode. At the moment there is no fancy configuration.
 I want to load python when I am editting sage files
 
 ```emacs-lisp
-(use-package python
+(use-package elpy
   :mode "\\.sage\\'"
+  :init
+  (elpy-enable)
+  (elpy-use-ipython)
   )
 ```
 
@@ -732,6 +758,27 @@ The only problem I have experienced with this is that indentation does not seem 
 
 ```emacs-lisp
 (server-start)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(helm-truncate-lines t))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(flyspell-duplicate ((t (:underline "DarkOrange"))))
+ '(flyspell-incorrect ((t (:background "#FFCCCC" :underline "Red1"))))
+ '(font-latex-math-face ((t (:foreground "#6E66B6"))))
+ '(helm-ff-directory ((t (:foreground "DarkRed"))))
+ '(highlight ((t (:background "#b5ffd1"))))
+ '(hl-line ((t (:background "#b5ffd1" :underline t))))
+ '(helm-ff-dotted-directory ((t (:foreground "DarkRed"))))
+ '(isearch-fail ((t (:background "#ffcccc"))))
+ '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea")))))
 ```
 
 

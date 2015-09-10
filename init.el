@@ -1,3 +1,4 @@
+(package-initialize)
 (require 'cask)
 (cask-initialize)
 (require 'pallet)
@@ -19,11 +20,12 @@
   :init
   (global-linum-mode -1))
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-(load-theme 'base16-eighties-dark :no-confirm)
-(add-to-list 'default-frame-alist '(font . "Menlo-12"))
+(load-theme 'mccarthy :no-confirm)
+;(load-theme 'base16-eighties-dark :no-confirm)
+(add-to-list 'default-frame-alist '(font . "Menlo-12")) 
 (use-package smart-mode-line
   :config
-  (load-theme 'smart-mode-line-respectful :no-confirm)
+;  (load-theme 'smart-mode-line-respectful :no-confirm)
   (setq sml/theme nil
         rm-blacklist "\\([A-z]\\|[-]\\)*")
   (sml/setup))
@@ -90,9 +92,16 @@
   (setq helm-mode-reverse-history nil)
   (helm-mode 1)
   (setq helm-locate-command "mdfind -onlyin $HOME -name %s %s | grep -v \"$HOME/Library\" ")
+  (setq helm-truncate-lines t)
   )
-(use-package ace-jump-mode
-  :bind ("C-c SPC" . ace-jump-mode)
+(use-package avy
+  :bind (("C-c SPC" . 'avy-goto-char)
+         ("C-c b" . 'avy-goto-char2)
+         ("M-c SPC" . 'avy-goto-line))
+  )
+(use-package swiper-helm
+  :bind (("C-s" . 'swiper-helm)
+         ("C-r" . 'swiper-helm))
   )
 (use-package company
   :config
@@ -120,6 +129,9 @@
   (sp-use-smartparens-bindings)
   (sp-pair "\\(" nil :actions :rem)
   (sp-pair "\\( " " \\)" :trigger "\\(")
+  (sp-pair "\\[ " " \\]" :trigger "\\[")
+  (sp-pair "\\\\( " " \\\\)" :trigger "\\\\(")
+  (sp-pair "\\\\[ " " \\\\]" :trigger "\\\\[")
   (sp-local-pair 'latex-mode "\\left| " " \\right|" :trigger "\\l|")
   (sp-local-pair 'latex-mode "\\left( " " \\right)" :trigger "\\l(")
   (sp-local-pair 'latex-mode "\\left{ " " \\right}" :trigger "\\l{")
@@ -224,16 +236,20 @@
         ))
 (use-package magma-mode
   :mode "\\.m\\'"
-  :init
-  (add-to-list 'load-path "~/.emacs.d/site-lisp/magma-mode"))
+  ; :init
+  ; (add-to-list 'load-path "~/.emacs.d/site-lisp/magma-mode")
+  )
 (use-package haskell-mode
   :mode "\\.hs\\'"
   :config
   (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
   (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
     )
-(use-package python
+(use-package elpy
   :mode "\\.sage\\'"
+  :init
+  (elpy-enable)
+  (elpy-use-ipython)
   )
 (use-package mmm-auto
   :config
@@ -287,3 +303,24 @@
   (mmm-add-mode-ext-class 'markdown-mode "\\.md\\'" 'markdown)
   )
 (server-start)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(helm-truncate-lines t))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(flyspell-duplicate ((t (:underline "DarkOrange"))))
+ '(flyspell-incorrect ((t (:background "#FFCCCC" :underline "Red1"))))
+ '(font-latex-math-face ((t (:foreground "#6E66B6"))))
+ '(helm-ff-directory ((t (:foreground "DarkRed"))))
+ '(highlight ((t (:background "#b5ffd1"))))
+ '(hl-line ((t (:background "#b5ffd1" :underline t))))
+ '(helm-ff-dotted-directory ((t (:foreground "DarkRed"))))
+ '(isearch-fail ((t (:background "#ffcccc"))))
+ '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea")))))
