@@ -95,13 +95,13 @@
   (setq helm-truncate-lines t)
   )
 (use-package avy
-  :bind (("C-c SPC" . 'avy-goto-char)
-         ("C-c b" . 'avy-goto-char2)
-         ("M-c SPC" . 'avy-goto-line))
+  :bind (("C-c SPC" . avy-goto-char)
+         ("C-c b" . avy-goto-char-2)
+         ("C-c v" . avy-goto-line))
   )
 (use-package swiper-helm
-  :bind (("C-s" . 'swiper-helm)
-         ("C-r" . 'swiper-helm))
+  :bind (("C-s" . swiper-helm)
+         ("C-r" . swiper-helm))
   )
 (use-package company
   :config

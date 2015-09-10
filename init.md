@@ -373,9 +373,9 @@ The other functions `avy-goto-char2` and `avy-goto-line` work the same except fo
 
 ```emacs-lisp
 (use-package avy
-  :bind (("C-c SPC" . 'avy-goto-char)
-         ("C-c b" . 'avy-goto-char2)
-         ("M-c SPC" . 'avy-goto-line))
+  :bind (("C-c SPC" . avy-goto-char)
+         ("C-c b" . avy-goto-char-2)
+         ("C-c v" . avy-goto-line))
   )
 ```
 
@@ -387,8 +387,8 @@ The other functions `avy-goto-char2` and `avy-goto-line` work the same except fo
 
 ```emacs-lisp
 (use-package swiper-helm
-  :bind (("C-s" . 'swiper-helm)
-         ("C-r" . 'swiper-helm))
+  :bind (("C-s" . swiper-helm)
+         ("C-r" . swiper-helm))
   )
 ```
 
