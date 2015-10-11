@@ -22,6 +22,8 @@
     - [Spelling](#Spelling)
     - [Popwin](#Popwin)
     - [Helm](#Helm)
+    - [Ivy](#Ivy)
+    - [Swiper](#Swiper)
     - [Avy](#Avy)
 - [Editing](#Editing)
     - [Company](#Company)
@@ -340,28 +342,60 @@ We also make sure flyspell starts by default in LaTeX and markdown modes.
 
 ### Helm <a name="Helm" /> ###
 
-[Helm][] is a completion and search package for emacs. It is kind of difficult to explain what it is, so just check out the website.
+[Helm][] is a completion and search package for emacs. It is kind of difficult to explain what it is, so just check out the website. I have stopped using this in favour of the lighter and quicker ivy. Hence the code is commented.
 
 I set `helm-mode-reverse-history` to `nil` as otherwise the history of whatever command I am running is shown after the normal set of completions. Normally when I run a command I have run it recently so this makes sense.
 
 [Helm]: https://github.com/emacs-helm/helm
 
 ```emacs-lisp
-(use-package helm
-  :bind (("M-x" . helm-M-x)
-         ("M-y" . helm-show-kill-ring)
-         ("C-x b" . helm-mini)
-         ("C-x C-f" . helm-find-files)
-         ("C-x C-b" . helm-buffers-list)
-         ("C-x C-r" . helm-recentf))
-  :config
-  (require 'helm-config)
-  (setq helm-mode-reverse-history nil)
-  (helm-mode 1)
-  (setq helm-locate-command "mdfind -onlyin $HOME -name %s %s | grep -v \"$HOME/Library\" ")
-  (setq helm-truncate-lines t)
+; (use-package helm
+;   :bind (("M-x" . helm-M-x)
+;          ("M-y" . helm-show-kill-ring)
+;          ("C-x b" . helm-mini)
+;          ("C-x C-f" . helm-find-files)
+;          ("C-x C-b" . helm-buffers-list)
+;          ("C-x C-r" . helm-recentf))
+;   :config
+;   (require 'helm-config)
+;   (setq helm-mode-reverse-history nil)
+;   (helm-mode 1)
+;   (setq helm-locate-command "mdfind -onlyin $HOME -name %s %s | grep -v \"$HOME/Library\" ")
+;   (setq helm-truncate-lines t)
+;   )
+```
+
+### Ivy <a name="Ivy" /> ###
+
+[Ivy][] is a completion framework like ido or help. It is lightweight and easy to use. The variable 'ivy-height' controls how many lines are shown in the minibuffer when completing candidates.
+
+[Ivy]: https://github.com/abo-abo/swiper
+
+```emacs-lisp
+(use-package ivy
+  :init (ivy-mode 1)
+  :bind (("C-x C-r" . ivy-recentf)
+         ("C-x b" . ivy-switch-buffer))
+  :config (setq ivy-height 15)
   )
 ```
+
+### Counsel <a name="Counsel" /> ###
+
+[Counsel][] is an add on to ivy.
+
+[Counsel]: https://github.com/abo-abo/swiper
+
+```emacs-lisp
+(use-package counsel
+  :bind (("M-x" . counsel-M-x)
+         ("C-h f" . counsel-describe-function)
+         ("C-h v" . counsel-describe-variable)
+         ("M-y" . counsel-yank-pop))
+  )
+```
+
+
 
 ### Avy <a name="Avy" /> ###
 
@@ -379,16 +413,16 @@ The other functions `avy-goto-char2` and `avy-goto-line` work the same except fo
   )
 ```
 
-### Swiper-helm <a name-"Swiper-helm" /> ###
+### Swiper <a name-"Swiper" /> ###
 
-[Swiper-helm][] is a minor mode which improves the standard regex search. It uses helm to show a list of options which you can choose from.
+[Swiper][] is a minor mode which improves the standard regex search. It uses ivy to show a list of options which you can choose from.
 
-[Swiper-helm]: https://github.com/abo-abo/swiper-helm
+[Swiper]: https://github.com/abo-abo/swiper
 
 ```emacs-lisp
-(use-package swiper-helm
-  :bind (("C-s" . swiper-helm)
-         ("C-r" . swiper-helm))
+(use-package swiper
+  :bind (("C-s" . swiper)
+         ("C-r" . swiper))
   )
 ```
 
@@ -489,10 +523,10 @@ Selecting regions intelligently is very useful, [Expand region][] allows to to i
 (use-package projectile
   :config
   (projectile-global-mode)
-  (setq projectile-completion-system 'helm)
+  (setq projectile-completion-system 'ivy)
   )
 
-(use-package helm-projectile)
+; (use-package helm-projectile)
 ```
 
 ## Markdown <a name="Markdown" /> ##

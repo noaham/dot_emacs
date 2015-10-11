@@ -49,7 +49,6 @@
 (depends-on "popup")
 (depends-on "projectile")
 (depends-on "python-environment")
-(depends-on "python-mode")
 (depends-on "pyvenv")
 (depends-on "rich-minority")
 (depends-on "s")

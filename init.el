@@ -80,28 +80,40 @@
     (add-hook 'LaTeX-mode-hook 'flyspell-mode)
     (add-hook 'markdown-mode-hook 'flyspell-mode)
     )
-(use-package helm
-  :bind (("M-x" . helm-M-x)
-         ("M-y" . helm-show-kill-ring)
-         ("C-x b" . helm-mini)
-         ("C-x C-f" . helm-find-files)
-         ("C-x C-b" . helm-buffers-list)
-         ("C-x C-r" . helm-recentf))
-  :config
-  (require 'helm-config)
-  (setq helm-mode-reverse-history nil)
-  (helm-mode 1)
-  (setq helm-locate-command "mdfind -onlyin $HOME -name %s %s | grep -v \"$HOME/Library\" ")
-  (setq helm-truncate-lines t)
+; (use-package helm
+;   :bind (("M-x" . helm-M-x)
+;          ("M-y" . helm-show-kill-ring)
+;          ("C-x b" . helm-mini)
+;          ("C-x C-f" . helm-find-files)
+;          ("C-x C-b" . helm-buffers-list)
+;          ("C-x C-r" . helm-recentf))
+;   :config
+;   (require 'helm-config)
+;   (setq helm-mode-reverse-history nil)
+;   (helm-mode 1)
+;   (setq helm-locate-command "mdfind -onlyin $HOME -name %s %s | grep -v \"$HOME/Library\" ")
+;   (setq helm-truncate-lines t)
+;   )
+(use-package ivy
+  :init (ivy-mode 1)
+  :bind (("C-x C-r" . ivy-recentf)
+         ("C-x b" . ivy-switch-buffer))
+  :config (setq ivy-height 15)
+  )
+(use-package counsel
+  :bind (("M-x" . counsel-M-x)
+         ("C-h f" . counsel-describe-function)
+         ("C-h v" . counsel-describe-variable)
+         ("M-y" . counsel-yank-pop))
   )
 (use-package avy
   :bind (("C-c SPC" . avy-goto-char)
          ("C-c b" . avy-goto-char-2)
          ("C-c v" . avy-goto-line))
   )
-(use-package swiper-helm
-  :bind (("C-s" . swiper-helm)
-         ("C-r" . swiper-helm))
+(use-package swiper
+  :bind (("C-s" . swiper)
+         ("C-r" . swiper))
   )
 (use-package company
   :config
@@ -144,10 +156,10 @@
 (use-package projectile
   :config
   (projectile-global-mode)
-  (setq projectile-completion-system 'helm)
+  (setq projectile-completion-system 'ivy)
   )
 
-(use-package helm-projectile)
+; (use-package helm-projectile)
 (use-package markdown-mode
   :mode "\\.md\\'"
   )
