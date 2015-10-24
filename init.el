@@ -6,9 +6,9 @@
 (require 'use-package)
 (setq use-package-verbose t
       use-package-idle-interval 10)
-(use-package paradox
-  :config
-  (setq paradox-github-token t))
+; (use-package paradox
+;   :config
+;   (setq paradox-github-token t))
 (setq default-frame-alist '((top + 100) 
 			    (left + 100) 
 			    (height . 62) 
@@ -102,19 +102,186 @@
   )
 (use-package counsel
   :bind (("M-x" . counsel-M-x)
+         ("C-x C-f" . counsel-find-file)
          ("C-h f" . counsel-describe-function)
          ("C-h v" . counsel-describe-variable)
          ("M-y" . counsel-yank-pop))
   )
-(use-package avy
-  :bind (("C-c SPC" . avy-goto-char)
-         ("C-c b" . avy-goto-char-2)
-         ("C-c v" . avy-goto-line))
-  )
+; (use-package avy
+;   :bind (("C-c SPC" . avy-goto-char)
+;          ("C-c b" . avy-goto-char-2)
+;          ("C-c v" . avy-goto-line))
+;   )
 (use-package swiper
   :bind (("C-s" . swiper)
          ("C-r" . swiper))
   )
+(use-package hydra
+  )
+(defhydra hydra-buffer-menu (:color pink
+                             :hint nil)
+  "
+^Mark^             ^Unmark^           ^Actions^          ^Search
+^^^^^^^^-----------------------------------------------------------------
+_m_: mark          _u_: unmark        _x_: execute       _R_: re-isearch
+_s_: save          _U_: unmark up     _b_: bury          _I_: isearch
+_d_: delete        ^ ^                _g_: refresh       _O_: multi-occur
+_D_: delete up     ^ ^                _T_: files only: % -28`Buffer-menu-files-only
+_~_: modified
+"
+  ("m" Buffer-menu-mark)
+  ("u" Buffer-menu-unmark)
+  ("U" Buffer-menu-backup-unmark)
+  ("d" Buffer-menu-delete)
+  ("D" Buffer-menu-delete-backwards)
+  ("s" Buffer-menu-save)
+  ("~" Buffer-menu-not-modified)
+  ("x" Buffer-menu-execute)
+  ("b" Buffer-menu-bury)
+  ("g" revert-buffer)
+  ("T" Buffer-menu-toggle-files-only)
+  ("O" Buffer-menu-multi-occur :color blue)
+  ("I" Buffer-menu-isearch-buffers :color blue)
+  ("R" Buffer-menu-isearch-buffers-regexp :color blue)
+  ("c" nil "cancel")
+  ("v" Buffer-menu-select "select" :color blue)
+  ("o" Buffer-menu-other-window "other-window" :color blue)
+  ("q" quit-window "quit" :color blue)
+  )
+
+(define-key Buffer-menu-mode-map "." 'hydra-buffer-menu/body)
+
+
+(defhydra hydra-move (:color pink :hint nil)
+  "
+_n_: next line     _f_: forward char  _F_: forward word  _a_: beginning line _v_: scroll up 
+_p_: previous line _b_: backward char _B_: backward word _e_: end line       _V_: scroll down
+_l_: re-center
+
+"
+  ("n" next-line)
+  ("p" previous-line)
+  ("f" forward-char)
+  ("b" backward-char)
+  ("F" forward-word)
+  ("B" backward-word)
+  ("a" beginning-of-line)
+  ("e" move-end-of-line)
+  ("v" scroll-up-command)
+  ;; Converting M-v to V here by analogy.
+  ("V" scroll-down-command)
+  ("l" recenter-top-bottom)
+  ("q" nil "quit" :color blue))
+
+(global-set-key (kbd "M-n") 'hydra-move/body)
+
+(defhydra hydra-org-move (:color pink :hint nil)
+  "
+_n_ext heading     _f_orward same level  _u_p level
+_p_revious heading _b_: back same level  _j_:ump
+
+"
+  ("n" outline-next-visible-heading)
+  ("p" outline-previous-visible-heading)
+  ("f" org-forward-heading-same-level)
+  ("b" org-backward-heading-same-level)
+  ("u" outline-up-heading)
+  ("j" org-goto :color blue)
+  ("q" nil "quit" :color blue))
+
+(global-set-key (kbd "C-c M-n") 'hydra-org-move/body)
+
+(global-set-key (kbd "M-p") 'hydra-sp/body)
+
+(defhydra hydra-sp (:hint nil)
+  "
+  _B_ backward-sexp            -----
+  _F_ forward-sexp               _s_ splice-sexp
+  _L_ backward-down-sexp         _df_ splice-sexp-killing-forward
+  _H_ backward-up-sexp           _db_ splice-sexp-killing-backward
+^^------                         _da_ splice-sexp-killing-around
+  _k_ down-sexp                -----
+  _j_ up-sexp                    _C-s_ select-next-thing-exchange
+-^^-----                         _C-p_ select-previous-thing
+  _n_ next-sexp                  _C-n_ select-next-thing
+  _p_ previous-sexp            -----
+  _a_ beginning-of-sexp          _C-f_ forward-symbol
+  _z_ end-of-sexp                _C-b_ backward-symbol
+--^^-                          -----
+  _t_ transpose-sexp             _c_ convolute-sexp
+-^^--                            _g_ absorb-sexp
+  _x_ delete-char                _q_ emit-sexp
+  _dw_ kill-word               -----
+  _dd_ kill-sexp                 _,b_ extract-before-sexp
+-^^--                            _,a_ extract-after-sexp
+  _S_ unwrap-sexp              -----
+-^^--                            _AP_ add-to-previous-sexp
+  _C-h_ forward-slurp-sexp       _AN_ add-to-next-sexp
+  _C-l_ forward-barf-sexp      -----
+  _C-S-h_ backward-slurp-sexp    _ join-sexp
+  _C-S-l_ backward-barf-sexp     _|_ split-sexp
+"
+  ;; TODO: Use () and [] - + * | <space>
+  ("B" sp-backward-sexp );; similiar to VIM b
+  ("F" sp-forward-sexp );; similar to VIM f
+  ;;
+  ("L" sp-backward-down-sexp )
+  ("H" sp-backward-up-sexp )
+  ;;
+  ("k" sp-down-sexp ) ; root - towards the root
+  ("j" sp-up-sexp )
+  ;;
+  ("n" sp-next-sexp )
+  ("p" sp-previous-sexp )
+  ;; a..z
+  ("a" sp-beginning-of-sexp )
+  ("z" sp-end-of-sexp )
+  ;;
+  ("t" sp-transpose-sexp )
+  ;;
+  ("x" sp-delete-char )
+  ("dw" sp-kill-word )
+  ;;("ds" sp-kill-symbol ) ;; Prefer kill-sexp
+  ("dd" sp-kill-sexp )
+  ;;("yy" sp-copy-sexp ) ;; Don't like it. Pref visual selection
+  ;;
+  ("S" sp-unwrap-sexp ) ;; Strip!
+  ;;("wh" sp-backward-unwrap-sexp ) ;; Too similar to above
+  ;;
+  ("C-h" sp-forward-slurp-sexp )
+  ("C-l" sp-forward-barf-sexp )
+  ("C-S-h" sp-backward-slurp-sexp )
+  ("C-S-l" sp-backward-barf-sexp )
+  ;;
+  ;;("C-[" (bind (sp-wrap-with-pair "[")) ) ;;FIXME
+  ;;("C-(" (bind (sp-wrap-with-pair "(")) )
+  ;;
+  ("s" sp-splice-sexp )
+  ("df" sp-splice-sexp-killing-forward )
+  ("db" sp-splice-sexp-killing-backward )
+  ("da" sp-splice-sexp-killing-around )
+  ;;
+  ("C-s" sp-select-next-thing-exchange )
+  ("C-p" sp-select-previous-thing)
+  ("C-n" sp-select-next-thing)
+  ;;
+  ("C-f" sp-forward-symbol )
+  ("C-b" sp-backward-symbol )
+  ;;
+  ;;("C-t" sp-prefix-tag-object)
+  ;;("H-p" sp-prefix-pair-object)
+  ("c" sp-convolute-sexp )
+  ("g" sp-absorb-sexp )
+  ("q" sp-emit-sexp )
+  ;;
+  (",b" sp-extract-before-sexp )
+  (",a" sp-extract-after-sexp )
+  ;;
+  ("AP" sp-add-to-previous-sexp );; Difference to slurp?
+  ("AN" sp-add-to-next-sexp )
+  ;;
+  ("_" sp-join-sexp ) ;;Good
+  ("|" sp-split-sexp )) 
 (use-package company
   :config
   (add-hook 'after-init-hook 'global-company-mode)
