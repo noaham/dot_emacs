@@ -401,8 +401,6 @@ I set `helm-mode-reverse-history` to `nil` as otherwise the history of whatever 
 
 ### Avy <a name="Avy" /> ###
 
-I have depreciated avy in favour of ivy.
-
 [Avy][] is a minor mode for jumping around the buffer. The way it works is, find the word you want to jump to the start of. Call `avy-goto-char`, this asks for the `char`, i.e. the character you want to jump to. When entered, this will change the character you want to move to, to a red letter. Type this letter and you will be magically transported there! If too many options exits, avy builds a tree which takes you there.
 
 The other functions `avy-goto-char2` and `avy-goto-line` work the same except for two chars and lines respectively.
@@ -410,11 +408,11 @@ The other functions `avy-goto-char2` and `avy-goto-line` work the same except fo
 [Avy]: https://github.com/abo-abo/avy
 
 ```emacs-lisp
-; (use-package avy
-;   :bind (("C-c SPC" . avy-goto-char)
-;          ("C-c b" . avy-goto-char-2)
-;          ("C-c v" . avy-goto-line))
-;   )
+(use-package avy
+  :bind (("C-c SPC" . avy-goto-char)
+         ("C-c b" . avy-goto-char-2)
+         ("C-c v" . avy-goto-line))
+  )
 ```
 
 ### Swiper <a name-"Swiper" /> ###

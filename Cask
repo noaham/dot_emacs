@@ -6,6 +6,7 @@
 (depends-on "async")
 (depends-on "auctex")
 (depends-on "auctex-latexmk")
+(depends-on "avy")
 (depends-on "bind-key")
 (depends-on "cask")
 (depends-on "company")
