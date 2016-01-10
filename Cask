@@ -28,6 +28,7 @@
 (depends-on "find-file-in-project")
 (depends-on "flatland-theme")
 (depends-on "flycheck")
+(depends-on "git-commit")
 (depends-on "goto-chg")
 (depends-on "haskell-mode")
 (depends-on "highlight-indentation")

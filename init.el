@@ -488,7 +488,8 @@ _p_revious heading _b_: back same level  _j_:ump
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(helm-truncate-lines t))
+ '(helm-truncate-lines t)
+ '(org-agenda-files (quote ("~/org/jobs.org"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -498,8 +499,8 @@ _p_revious heading _b_: back same level  _j_:ump
  '(flyspell-incorrect ((t (:background "#FFCCCC" :underline "Red1"))))
  '(font-latex-math-face ((t (:foreground "#6E66B6"))))
  '(helm-ff-directory ((t (:foreground "DarkRed"))))
+ '(helm-ff-dotted-directory ((t (:foreground "DarkRed"))))
  '(highlight ((t (:background "#b5ffd1"))))
  '(hl-line ((t (:background "#b5ffd1" :underline t))))
- '(helm-ff-dotted-directory ((t (:foreground "DarkRed"))))
  '(isearch-fail ((t (:background "#ffcccc"))))
  '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea")))))
