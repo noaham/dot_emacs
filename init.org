@@ -1,5 +1,7 @@
 #+TITLE: Emacs init file
 #+PROPERTY: header-args  :tangle yes
+#+OPTIONS: toc:3
+
 
 * Emacs init
 ** Introduction
