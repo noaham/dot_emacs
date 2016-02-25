@@ -553,6 +553,6 @@ _p_revious heading _b_: back same level  _j_:ump
  '(hl-line ((t (:background "#b5ffd1" :underline t))))
  '(helm-ff-dotted-directory ((t (:foreground "DarkRed"))))
  '(isearch-fail ((t (:background "#ffcccc"))))
- '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea"))))
+ '(show-paren-match ((t (:background "#ff4500" :foreground "#e1e1e1" :weight bold)))) 
  '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea"))))
  )
