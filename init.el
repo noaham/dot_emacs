@@ -1,45 +1,59 @@
+
 (package-initialize)
 (require 'cask)
 (cask-initialize)
 (require 'pallet)
 (pallet-mode t)
+
 (require 'use-package)
 (setq use-package-verbose t
       use-package-idle-interval 10)
+
 ; (use-package paradox
 ;   :config
 ;   (setq paradox-github-token t))
+
 (setq default-frame-alist '((top + 100) 
-			    (left + 100) 
-			    (height . 62) 
-			    (width . 120)))
+                (left + 100) 
+                (height . 62) 
+                (width . 120)))
+
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+
 (setq inhibit-startup-message t)
+
 (use-package linum
   :init
   (global-linum-mode -1))
+
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 (load-theme 'mccarthy :no-confirm)
 ;(load-theme 'base16-eighties-dark :no-confirm)
-(add-to-list 'default-frame-alist '(font . "Menlo-12")) 
+
+(add-to-list 'default-frame-alist '(font . "Menlo-12"))
+
 (use-package smart-mode-line
   :config
 ;  (load-theme 'smart-mode-line-respectful :no-confirm)
   (setq sml/theme nil
         rm-blacklist "\\([A-z]\\|[-]\\)*")
   (sml/setup))
+
 (setq ring-bell-function 'ignore)
+
 (delete-selection-mode)
-(setq backup-by-copying t 
-      backup-directory-alist
-      '((".*" . "~/.emacs.d/backups")) 
-      auto-save-file-name-transforms
-      '((".*" "~/.emacs.d/autosaves/" t)) 
-      delete-old-versions t
-      kept-new-versions 6
-      kept-old-versions 2
-      version-control t)
+
+;; (setq backup-by-copying t 
+;;       backup-directory-alist
+;;       '((".*" . "~/.emacs.d/backups")) 
+;;       auto-save-file-name-transforms
+;;       '((".*" "~/.emacs.d/autosaves/" t)) 
+;;       delete-old-versions t
+;;       kept-new-versions 6
+;;       kept-old-versions 2
+;;       version-control t)
+
 (use-package savehist
   :config
   (savehist-mode 1)
@@ -48,17 +62,21 @@
         savehist-additional-variables '(search-ring
                                         regexp-search-ring))
 )
+
 (use-package saveplace
   :init
   (setq-default save-place t)
   (setq save-place-file "~/.emacs.d/places"))
+
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
 (global-set-key (kbd "RET") 'newline-and-indent)
+
 (use-package windmove
   :config
   (windmove-default-keybindings)
   )
+
 (use-package recentf
   :config
   (setq recentf-save-file "~/.emacs.d/.recentf")
@@ -66,11 +84,14 @@
   (setq recentf-max-menu-items 50)
   (add-to-list 'recentf-exclude "\\.emacs.d/.cask/")
   )
+
 (use-package undo-tree
   :config
   (global-undo-tree-mode)
   )
+
 (global-visual-line-mode 1)
+
 (use-package flyspell
   :bind
   ("C-'" . ispell-word)
@@ -80,6 +101,7 @@
     (add-hook 'LaTeX-mode-hook 'flyspell-mode)
     (add-hook 'markdown-mode-hook 'flyspell-mode)
     )
+
 ; (use-package helm
 ;   :bind (("M-x" . helm-M-x)
 ;          ("M-y" . helm-show-kill-ring)
@@ -94,12 +116,14 @@
 ;   (setq helm-locate-command "mdfind -onlyin $HOME -name %s %s | grep -v \"$HOME/Library\" ")
 ;   (setq helm-truncate-lines t)
 ;   )
+
 (use-package ivy
   :init (ivy-mode 1)
   :bind (("C-x C-r" . ivy-recentf)
          ("C-x b" . ivy-switch-buffer))
   :config (setq ivy-height 15)
   )
+
 (use-package counsel
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
@@ -107,17 +131,21 @@
          ("C-h v" . counsel-describe-variable)
          ("M-y" . counsel-yank-pop))
   )
+
 (use-package avy
   :bind (("C-c SPC" . avy-goto-char)
          ("C-c b" . avy-goto-char-2)
          ("C-c v" . avy-goto-line))
   )
+
 (use-package swiper
   :bind (("C-s" . swiper)
          ("C-r" . swiper))
   )
+
 (use-package hydra
   )
+
 (defhydra hydra-buffer-menu (:color pink
                              :hint nil)
   "
@@ -281,13 +309,15 @@ _p_revious heading _b_: back same level  _j_:ump
   ("AN" sp-add-to-next-sexp )
   ;;
   ("_" sp-join-sexp ) ;;Good
-  ("|" sp-split-sexp )) 
+  ("|" sp-split-sexp ))
+
 (use-package company
   :config
   (add-hook 'after-init-hook 'global-company-mode)
   (bind-key "C-n" 'company-select-next company-active-map)
   (bind-key "C-p" 'company-select-previous company-active-map)
   )
+
 (use-package smartparens-config
   ; :bind (("C-M-f" . 'sp-forward-sexp)
   ; ("C-M-b" . 'sp-backward-sexp)
@@ -315,11 +345,14 @@ _p_revious heading _b_: back same level  _j_:ump
   (sp-local-pair 'latex-mode "\\left( " " \\right)" :trigger "\\l(")
   (sp-local-pair 'latex-mode "\\left{ " " \\right}" :trigger "\\l{")
   )
+
 (use-package expand-region
   :bind (("C-=" . er/expand-region)
          ("C-+" . er/contract-region))
   )
+
 (use-package yasnippet)
+
 (use-package projectile
   :config
   (projectile-global-mode)
@@ -327,9 +360,20 @@ _p_revious heading _b_: back same level  _j_:ump
   )
 
 ; (use-package helm-projectile)
+
+(use-package tiny
+  )
+
+(use-package org
+  :defer t
+  :init
+  (setq org-src-fontify-natively t)
+  )
+
 (use-package markdown-mode
   :mode "\\.md\\'"
   )
+
 (use-package tex-site
 ;  :defer t
   :config
@@ -386,12 +430,14 @@ _p_revious heading _b_: back same level  _j_:ump
               )
             )
   (setq reftex-plug-into-AUCTeX t)
+  (setq reftex-label-regexps '("\\\\label{\\(?1:[^}]*\\)}"))
   )
 
 (use-package auctex-latexmk
   :config
   (auctex-latexmk-setup)
   )
+
 (use-package reftex
 ;  :defer t
   :config
@@ -413,23 +459,27 @@ _p_revious heading _b_: back same level  _j_:ump
           ("Remark" ?r "rem:" "~\\ref{%s}" t ("Remark" "rem."))
           ("Problem" ?o "prb:" "~\\ref{%s}" t ("Remark" "prb.")))
         ))
+
 (use-package magma-mode
   :mode "\\.m\\'"
   ; :init
   ; (add-to-list 'load-path "~/.emacs.d/site-lisp/magma-mode")
   )
+
 (use-package haskell-mode
   :mode "\\.hs\\'"
   :config
   (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
   (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
     )
+
 (use-package elpy
   :mode "\\.sage\\'"
-  :init
+  :config
   (elpy-enable)
   (elpy-use-ipython)
   )
+
 (use-package mmm-auto
   :config
   (setq mmm-global-mode 'maybe)
@@ -481,6 +531,7 @@ _p_revious heading _b_: back same level  _j_:ump
       )))
   (mmm-add-mode-ext-class 'markdown-mode "\\.md\\'" 'markdown)
   )
+
 (server-start)
 
 (custom-set-variables
@@ -488,8 +539,7 @@ _p_revious heading _b_: back same level  _j_:ump
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(helm-truncate-lines t)
- '(org-agenda-files (quote ("~/org/jobs.org"))))
+ '(helm-truncate-lines t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -499,8 +549,10 @@ _p_revious heading _b_: back same level  _j_:ump
  '(flyspell-incorrect ((t (:background "#FFCCCC" :underline "Red1"))))
  '(font-latex-math-face ((t (:foreground "#6E66B6"))))
  '(helm-ff-directory ((t (:foreground "DarkRed"))))
- '(helm-ff-dotted-directory ((t (:foreground "DarkRed"))))
  '(highlight ((t (:background "#b5ffd1"))))
  '(hl-line ((t (:background "#b5ffd1" :underline t))))
+ '(helm-ff-dotted-directory ((t (:foreground "DarkRed"))))
  '(isearch-fail ((t (:background "#ffcccc"))))
- '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea")))))
+ '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea"))))
+ '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea"))))
+ )
