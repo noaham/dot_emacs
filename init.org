@@ -347,7 +347,7 @@ after customising this variable as otherwise it doesn't work.
       :config
       (setq recentf-save-file "~/.emacs.d/.recentf")
       (recentf-mode t)
-      (setq recentf-max-menu-items 50)
+      (setq recentf-max-menu-items 200)
       (add-to-list 'recentf-exclude "\\.emacs.d/.cask/")
       )
 #+END_SRC
