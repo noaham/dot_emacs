@@ -1,0 +1,23 @@
+
+;; ----- smex-history -----
+(
+ replace-regexp
+ replace-string
+ revert-buffer
+ goto-line
+ server-start
+ latex-preview-pane-mode
+ package-list-packages
+)
+
+;; ----- smex-data -----
+(
+ (org-babel-tangle . 1)
+ (package-list-packages . 1)
+ (latex-preview-pane-mode . 2)
+ (server-start . 1)
+ (revert-buffer . 5)
+ (replace-string . 5)
+ (goto-line . 1)
+ (replace-regexp . 1)
+)

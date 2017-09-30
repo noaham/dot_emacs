@@ -13,9 +13,9 @@
 ;   :config
 ;   (setq paradox-github-token t))
 
-(setq default-frame-alist '((top + 100) 
-                (left + 100) 
-                (height . 62) 
+(setq default-frame-alist '((top + 0) 
+                (left + 0) 
+                (height . 100) 
                 (width . 120)))
 
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
@@ -29,7 +29,9 @@
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 (load-theme 'mccarthy :no-confirm)
-;(load-theme 'base16-eighties-dark :no-confirm)
+; (load-theme 'base16-eighties-dark :no-confirm)
+;(add-to-list 'load-path "~/.emacs.d/themes/emacs-doom-theme")
+;(load-theme 'dracula :no-confirm)
 
 (add-to-list 'default-frame-alist '(font . "Menlo-12"))
 
@@ -119,8 +121,7 @@
 
 (use-package ivy
   :init (ivy-mode 1)
-  :bind (("C-x C-r" . ivy-recentf)
-         ("C-x b" . ivy-switch-buffer))
+  :bind ("C-x b" . ivy-switch-buffer)
   :config (setq ivy-height 15)
   )
 
@@ -129,7 +130,8 @@
          ("C-x C-f" . counsel-find-file)
          ("C-h f" . counsel-describe-function)
          ("C-h v" . counsel-describe-variable)
-         ("M-y" . counsel-yank-pop))
+         ("M-y" . counsel-yank-pop)
+         ("C-x C-r" . counsel-recentf))
   )
 
 (use-package avy
@@ -374,11 +376,11 @@ _p_revious heading _b_: back same level  _j_:ump
   :mode "\\.md\\'"
   )
 
-(use-package tex-site
-;  :defer t
+(use-package auctex
+  :defer t
   :config
-  (setq TeX-engine 'xetex
-        exec-path (append exec-path '("/usr/texbin")))
+  ;; (setq TeX-engine 'xetex
+  ;;       exec-path (append exec-path '("/usr/texbin")))
   (setenv "TEXINPUTS" ".:~/latex:")
   (setenv "PATH" (concat (getenv "PATH") ":/usr/texbin"))
   :init
@@ -386,7 +388,20 @@ _p_revious heading _b_: back same level  _j_:ump
             (lambda() 
               (add-to-list 
                'TeX-command-list 
-               '("XeLaTeX" "%`xelatex%(mode) --shell-escape%' %t" TeX-run-TeX nil t))))
+               '("XeLaTeX" "%`xelatex%(mode) --shell-escape%' %t" TeX-run-TeX nil t))
+              (setq
+               ;; Set the list of viewers for Mac OS X.
+               TeX-view-program-list
+               '(("Preview.app" "open -a Preview.app %o")
+                 ("Skim" "displayline -b -g %n %o %b")
+                 ("displayline" "displayline %n %o %b")
+                 ("open" "open %o"))
+               ;; Select the viewers for each file type.
+               TeX-view-program-selection
+               '((output-dvi "open")
+                 (output-pdf "Skim")
+                 (output-html "open")))
+                ))
   (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
   (add-hook 'LaTeX-mode-hook
             (lambda ()
@@ -427,6 +442,10 @@ _p_revious heading _b_: back same level  _j_:ump
               (yas-minor-mode)
               (company-auctex-init)
               (flyspell-mode)
+              (TeX-PDF-mode 1)
+              ;; (setq TeX-source-correlate-mode t)
+              ;; (setq TeX-source-correlate-start-server t)
+              ;; (setq TeX-source-correlate-method 'synctex)
               )
             )
   (setq reftex-plug-into-AUCTeX t)
@@ -434,7 +453,7 @@ _p_revious heading _b_: back same level  _j_:ump
   )
 
 (use-package auctex-latexmk
-  :config
+  :init
   (auctex-latexmk-setup)
   )
 
@@ -480,74 +499,60 @@ _p_revious heading _b_: back same level  _j_:ump
   (elpy-use-ipython)
   )
 
-(use-package mmm-auto
-  :config
-  (setq mmm-global-mode 'maybe)
-  (defvar mmm-markdown-mode-alist '())
-  (defun mmm-markdown-get-mode (string)
-    (string-match "[a-zA-Z_-]+" string)
-    (setq string (match-string 0 string))
-    (or (mmm-ensure-modename
-         ;; First try the user override variable.
-         (some #'(lambda (pair)
-                   (if (string-match (car pair) string) (cdr pair) nil))
-               mmm-markdown-mode-alist))
-        (let ((words (split-string (downcase string) "[_-]+")))
-          (or (mmm-ensure-modename
-               ;; Try the whole name, stopping at "mode" if present.
-               (intern
-                (mapconcat #'identity
-                           (nconc (ldiff words (member "mode" words))
-                                  (list "mode"))
-                           "-")))
-              ;; Try each word by itself (preference list)
-              (some #'(lambda (word)
-                        (mmm-ensure-modename (intern word)))
-                    words)
-              ;; Try each word with -mode tacked on
-              (some #'(lambda (word)
-                        (mmm-ensure-modename
-                         (intern (concat word "-mode"))))
-                    words)
-              ;; Try each pair of words with -mode tacked on
-              (loop for (one two) on words
-                    if (mmm-ensure-modename
-                        (intern (concat one two "-mode")))
-                    return it)
-              ;; I'm unaware of any modes whose names, minus `-mode',
-              ;; are more than two words long, and if the entire mode
-              ;; name (perhaps minus `-mode') doesn't occur in the
-              ;; markdownument name, we can give up.
-              (signal 'mmm-no-matching-submode nil)))))
-  (mmm-add-classes
-   '((markdown
-      :front "```+\\([a-zA-Z0-9_-]+\\)"
-      :front-offset (end-of-line 1)
-      :back "```+[ ]*$"
-      :save-matches 1
-      :delimiter-mode nil
-      :match-submode mmm-markdown-get-mode
-      :end-not-begin t
-      )))
-  (mmm-add-mode-ext-class 'markdown-mode "\\.md\\'" 'markdown)
-  )
+;; (use-package mmm-auto
+;;   :config
+;;   (setq mmm-global-mode 'maybe)
+;;   (defvar mmm-markdown-mode-alist '())
+;;   (defun mmm-markdown-get-mode (string)
+;;     (string-match "[a-zA-Z_-]+" string)
+;;     (setq string (match-string 0 string))
+;;     (or (mmm-ensure-modename
+;;          ;; First try the user override variable.
+;;          (some #'(lambda (pair)
+;;                    (if (string-match (car pair) string) (cdr pair) nil))
+;;                mmm-markdown-mode-alist))
+;;         (let ((words (split-string (downcase string) "[_-]+")))
+;;           (or (mmm-ensure-modename
+;;                ;; Try the whole name, stopping at "mode" if present.
+;;                (intern
+;;                 (mapconcat #'identity
+;;                            (nconc (ldiff words (member "mode" words))
+;;                                   (list "mode"))
+;;                            "-")))
+;;               ;; Try each word by itself (preference list)
+;;               (some #'(lambda (word)
+;;                         (mmm-ensure-modename (intern word)))
+;;                     words)
+;;               ;; Try each word with -mode tacked on
+;;               (some #'(lambda (word)
+;;                         (mmm-ensure-modename
+;;                          (intern (concat word "-mode"))))
+;;                     words)
+;;               ;; Try each pair of words with -mode tacked on
+;;               (loop for (one two) on words
+;;                     if (mmm-ensure-modename
+;;                         (intern (concat one two "-mode")))
+;;                     return it)
+;;               ;; I'm unaware of any modes whose names, minus `-mode',
+;;               ;; are more than two words long, and if the entire mode
+;;               ;; name (perhaps minus `-mode') doesn't occur in the
+;;               ;; markdownument name, we can give up.
+;;               (signal 'mmm-no-matching-submode nil)))))
+;;   (mmm-add-classes
+;;    '((markdown
+;;       :front "```+\\([a-zA-Z0-9_-]+\\)"
+;;       :front-offset (end-of-line 1)
+;;       :back "```+[ ]*$"
+;;       :save-matches 1
+;;       :delimiter-mode nil
+;;       :match-submode mmm-markdown-get-mode
+;;       :end-not-begin t
+;;       )))
+;;   (mmm-add-mode-ext-class 'markdown-mode "\\.md\\'" 'markdown)
+;;   )
 
 (server-start)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(helm-truncate-lines t)
- '(safe-local-variable-values
-   (quote
-    ((org-todo-keyword-faces
-      ("SHORTLISTED" . "orange")
-      ("OFFERED" . "blue")
-      ("REJECTED" . "red")
-      ("CANCELED" . "red")
-      ("WAIT" . "yellow"))))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -556,10 +561,10 @@ _p_revious heading _b_: back same level  _j_:ump
  '(flyspell-duplicate ((t (:underline "DarkOrange"))))
  '(flyspell-incorrect ((t (:background "#FFCCCC" :underline "Red1"))))
  '(font-latex-math-face ((t (:foreground "#6E66B6"))))
- '(helm-ff-directory ((t (:foreground "DarkRed"))))
- '(helm-ff-dotted-directory ((t (:foreground "DarkRed"))))
  '(highlight ((t (:background "#b5ffd1"))))
  '(hl-line ((t (:background "#b5ffd1" :underline t))))
+ ;; '(helm-ff-dotted-directory ((t (:foreground "DarkRed"))))
  '(isearch-fail ((t (:background "#ffcccc"))))
- '(show-paren-match ((t (:background "#ff4500" :foreground "#e1e1e1" :weight bold))))
- '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea")))))
+ '(show-paren-match ((t (:background "#ff4500" :foreground "#e1e1e1" :weight bold)))) 
+ '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea"))))
+ )
