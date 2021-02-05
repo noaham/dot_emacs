@@ -1,4 +1,3 @@
-
 (package-initialize)
 (require 'cask)
 (cask-initialize)
@@ -23,24 +22,39 @@
 
 (setq inhibit-startup-message t)
 
-(use-package linum
-  :init
-  (global-linum-mode -1))
+;; (use-package linum
+;;   :init
+;;   (global-linum-mode -1))
 
-(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-(load-theme 'mccarthy :no-confirm)
+; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+; (load-theme 'mccarthy :no-confirm)
 ; (load-theme 'base16-eighties-dark :no-confirm)
-;(add-to-list 'load-path "~/.emacs.d/themes/emacs-doom-theme")
-;(load-theme 'dracula :no-confirm)
+; (add-to-list 'load-path "~/.emacs.d/themes/emacs-doom-theme")
+; (load-theme 'dracula :no-confirm)
+(use-package doom-themes
+  :config
+  (load-theme 'doom-one t)
+  (doom-themes-visual-bell-config)
+  (doom-themes-neotree-config)
+  (doom-themes-org-config)
+  )
+(use-package solaire-mode
+  :hook ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
+  :config
+  (add-hook 'minibuffer-setup-hook #'solaire-mode-in-minibuffer)
+  (solaire-mode-swap-bg))
 
 (add-to-list 'default-frame-alist '(font . "Menlo-12"))
 
-(use-package smart-mode-line
-  :config
-;  (load-theme 'smart-mode-line-respectful :no-confirm)
-  (setq sml/theme nil
-        rm-blacklist "\\([A-z]\\|[-]\\)*")
-  (sml/setup))
+;; (use-package smart-mode-line
+;;   :config
+;; ;  (load-theme 'smart-mode-line-respectful :no-confirm)
+;;   (setq sml/theme nil
+;;         rm-blacklist "\\([A-z]\\|[-]\\)*")
+(use-package doom-modeline
+      :ensure t
+      :defer t
+      :hook (after-init . doom-modeline-init));;   (sml/setup))
 
 (setq ring-bell-function 'ignore)
 
@@ -67,8 +81,9 @@
 
 (use-package saveplace
   :init
+  (setq save-place-file "~/.emacs.d/places")
   (setq-default save-place t)
-  (setq save-place-file "~/.emacs.d/places"))
+  (save-place-mode t))
 
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
@@ -83,7 +98,7 @@
   :config
   (setq recentf-save-file "~/.emacs.d/.recentf")
   (recentf-mode t)
-  (setq recentf-max-menu-items 200)
+  (setq recentf-max-menu-items 5000)
   (add-to-list 'recentf-exclude "\\.emacs.d/.cask/")
   )
 
@@ -103,6 +118,11 @@
     (add-hook 'LaTeX-mode-hook 'flyspell-mode)
     (add-hook 'markdown-mode-hook 'flyspell-mode)
     )
+
+(use-package neotree
+  :init
+  (setq neo-smart-open t)
+  )
 
 ; (use-package helm
 ;   :bind (("M-x" . helm-M-x)
@@ -321,32 +341,13 @@ _p_revious heading _b_: back same level  _j_:ump
   )
 
 (use-package smartparens-config
-  ; :bind (("C-M-f" . 'sp-forward-sexp)
-  ; ("C-M-b" . 'sp-backward-sexp)
-  ; ("C-M-d" . 'sp-down-sexp)
-  ; ("C-M-a" . 'sp-backward-down-sexp)
-  ; ("C-S-a" . 'sp-beginning-of-sexp)
-  ; ("C-S-d" . 'sp-end-of-sexp)
-  ; ("C-M-e" . 'sp-up-sexp)
-  ; ("C-M-u" . 'sp-backward-up-sexp)
-  ; ("C-M-t" . 'sp-transpose-sexp)
-  ; ("C-M-n" . 'sp-next-sexp)
-  ; ("C-M-p" . 'sp-previous-sexp)
-  ; ("C-M-k" . 'sp-kill-sexp)
-  ; ("C-M-w" . 'sp-copy-sexp))
-  :config
-  (smartparens-global-mode t)
-  (show-smartparens-global-mode t)
-  (sp-use-smartparens-bindings)
-  (sp-pair "\\(" nil :actions :rem)
-  (sp-pair "\\( " " \\)" :trigger "\\(")
-  (sp-pair "\\[ " " \\]" :trigger "\\[")
-  (sp-pair "\\\\( " " \\\\)" :trigger "\\\\(")
-  (sp-pair "\\\\[ " " \\\\]" :trigger "\\\\[")
-  (sp-local-pair 'latex-mode "\\left| " " \\right|" :trigger "\\l|")
-  (sp-local-pair 'latex-mode "\\left( " " \\right)" :trigger "\\l(")
-  (sp-local-pair 'latex-mode "\\left{ " " \\right}" :trigger "\\l{")
-  )
+      :config
+      (smartparens-global-mode t)
+      (show-smartparens-global-mode t)
+;;       (sp-use-smartparens-bindings)
+      (sp-local-pair 'tex-mode "\\(" "\\)" :post-handlers '(:add " | "))
+      (sp-local-pair 'tex-mode "\\[" "\\]" :post-handlers '(:add " | "))
+      )
 
 (use-package expand-region
   :bind (("C-=" . er/expand-region)
@@ -381,7 +382,6 @@ _p_revious heading _b_: back same level  _j_:ump
   :config
   ;; (setq TeX-engine 'xetex
   ;;       exec-path (append exec-path '("/usr/texbin")))
-  (setenv "TEXINPUTS" ".:~/latex:")
   (setenv "PATH" (concat (getenv "PATH") ":/usr/texbin"))
   :init
   (add-hook 'LaTeX-mode-hook 
@@ -450,6 +450,7 @@ _p_revious heading _b_: back same level  _j_:ump
             )
   (setq reftex-plug-into-AUCTeX t)
   (setq reftex-label-regexps '("\\\\label{\\(?1:[^}]*\\)}"))
+  (setenv "TEXINPUTS" ".:~/.latexrc:")
   )
 
 (use-package auctex-latexmk
@@ -479,24 +480,29 @@ _p_revious heading _b_: back same level  _j_:ump
           ("Problem" ?o "prb:" "~\\ref{%s}" t ("Remark" "prb.")))
         ))
 
+(use-package magit-
+  :bind (("C-c g" . magit-status))
+  :config
+  (provide 'init-magit)
+  )
+
 (use-package magma-mode
   :mode "\\.m\\'"
   ; :init
   ; (add-to-list 'load-path "~/.emacs.d/site-lisp/magma-mode")
   )
 
-(use-package haskell-mode
-  :mode "\\.hs\\'"
-  :config
-  (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-  (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-    )
+;; (use-package haskell-mode
+;;   :mode "\\.hs\\'"
+;;   :config
+;;   (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+;;   (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+;;     )
 
 (use-package elpy
   :mode "\\.sage\\'"
   :config
   (elpy-enable)
-  (elpy-use-ipython)
   )
 
 ;; (use-package mmm-auto
@@ -558,13 +564,13 @@ _p_revious heading _b_: back same level  _j_:ump
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(flyspell-duplicate ((t (:underline "DarkOrange"))))
- '(flyspell-incorrect ((t (:background "#FFCCCC" :underline "Red1"))))
- '(font-latex-math-face ((t (:foreground "#6E66B6"))))
- '(highlight ((t (:background "#b5ffd1"))))
- '(hl-line ((t (:background "#b5ffd1" :underline t))))
- ;; '(helm-ff-dotted-directory ((t (:foreground "DarkRed"))))
- '(isearch-fail ((t (:background "#ffcccc"))))
- '(show-paren-match ((t (:background "#ff4500" :foreground "#e1e1e1" :weight bold)))) 
- '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea"))))
+ ;; '(flyspell-duplicate ((t (:underline "DarkOrange"))))
+ ;; '(flyspell-incorrect ((t (:background "#FFCCCC" :underline "Red1"))))
+ ;; '(font-latex-math-face ((t (:foreground "#6E66B6"))))
+ ;; '(highlight ((t (:background "#b5ffd1"))))
+ ;; '(hl-line ((t (:background "#b5ffd1" :underline t))))
+ ;; ;; '(helm-ff-dotted-directory ((t (:foreground "DarkRed"))))
+ ;; '(isearch-fail ((t (:background "#ffcccc"))))
+ ;; '(show-paren-match ((t (:background "#ff4500" :foreground "#e1e1e1" :weight bold)))) 
+ ;; '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea"))))
  )

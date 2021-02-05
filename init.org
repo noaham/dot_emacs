@@ -42,6 +42,7 @@
     + [[AUCTeX]]
     + [[RefTeX]]
   + [[Programming]]
+    + [[Magit]]
     + [[Magma]]
     + [[Haskell]]
     + [[Python]]
@@ -180,9 +181,9 @@ the moment it is commented out but it can be started on a per buffer
 basis with =M-x linum-mode= or globally with =M-x global-linum-mode=.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package linum
-      :init
-      (global-linum-mode -1))
+  ;; (use-package linum
+  ;;   :init
+  ;;   (global-linum-mode -1))
 #+END_SRC
 
 *** Theme
@@ -195,11 +196,23 @@ theme. The keyword =:no-confirm= means that emacs wont constantly ask if
 it is safe to run the lisp code in the theme.
 
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-  (load-theme 'mccarthy :no-confirm)
+  ; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+  ; (load-theme 'mccarthy :no-confirm)
   ; (load-theme 'base16-eighties-dark :no-confirm)
-  ;(add-to-list 'load-path "~/.emacs.d/themes/emacs-doom-theme")
-  ;(load-theme 'dracula :no-confirm)
+  ; (add-to-list 'load-path "~/.emacs.d/themes/emacs-doom-theme")
+  ; (load-theme 'dracula :no-confirm)
+  (use-package doom-themes
+    :config
+    (load-theme 'doom-one t)
+    (doom-themes-visual-bell-config)
+    (doom-themes-neotree-config)
+    (doom-themes-org-config)
+    )
+  (use-package solaire-mode
+    :hook ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
+    :config
+    (add-hook 'minibuffer-setup-hook #'solaire-mode-in-minibuffer)
+    (solaire-mode-swap-bg))
 #+END_SRC
 
 *** Font
@@ -222,12 +235,15 @@ regex argument and hides all matching minor modes, since I don't want to
 see any minor modes I hide them all.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package smart-mode-line
-      :config
-    ;  (load-theme 'smart-mode-line-respectful :no-confirm)
-      (setq sml/theme nil
-            rm-blacklist "\\([A-z]\\|[-]\\)*")
-      (sml/setup))
+  ;; (use-package smart-mode-line
+  ;;   :config
+  ;; ;  (load-theme 'smart-mode-line-respectful :no-confirm)
+  ;;   (setq sml/theme nil
+  ;;         rm-blacklist "\\([A-z]\\|[-]\\)*")
+  (use-package doom-modeline
+        :ensure t
+        :defer t
+        :hook (after-init . doom-modeline-init));;   (sml/setup))
 #+END_SRC
 
 ** Emacs behaviour
@@ -300,8 +316,9 @@ file of the same name.
 #+BEGIN_SRC emacs-lisp
     (use-package saveplace
       :init
+      (setq save-place-file "~/.emacs.d/places")
       (setq-default save-place t)
-      (setq save-place-file "~/.emacs.d/places"))
+      (save-place-mode t))
 #+END_SRC
 
 *** Indentation and tabs
@@ -349,7 +366,7 @@ after customising this variable as otherwise it doesn't work.
       :config
       (setq recentf-save-file "~/.emacs.d/.recentf")
       (recentf-mode t)
-      (setq recentf-max-menu-items 200)
+      (setq recentf-max-menu-items 5000)
       (add-to-list 'recentf-exclude "\\.emacs.d/.cask/")
       )
 #+END_SRC
@@ -399,6 +416,15 @@ modes.
         (add-hook 'LaTeX-mode-hook 'flyspell-mode)
         (add-hook 'markdown-mode-hook 'flyspell-mode)
         )
+#+END_SRC
+
+*** Neotree
+
+#+BEGIN_SRC emacs-lisp
+  (use-package neotree
+    :init
+    (setq neo-smart-open t)
+    )
 #+END_SRC
 
 *** Helm
@@ -712,33 +738,14 @@ substitute =nil= for ="RIGHT"= to delete the definition of a pair
 locally.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package smartparens-config
-      ; :bind (("C-M-f" . 'sp-forward-sexp)
-      ; ("C-M-b" . 'sp-backward-sexp)
-      ; ("C-M-d" . 'sp-down-sexp)
-      ; ("C-M-a" . 'sp-backward-down-sexp)
-      ; ("C-S-a" . 'sp-beginning-of-sexp)
-      ; ("C-S-d" . 'sp-end-of-sexp)
-      ; ("C-M-e" . 'sp-up-sexp)
-      ; ("C-M-u" . 'sp-backward-up-sexp)
-      ; ("C-M-t" . 'sp-transpose-sexp)
-      ; ("C-M-n" . 'sp-next-sexp)
-      ; ("C-M-p" . 'sp-previous-sexp)
-      ; ("C-M-k" . 'sp-kill-sexp)
-      ; ("C-M-w" . 'sp-copy-sexp))
-      :config
-      (smartparens-global-mode t)
-      (show-smartparens-global-mode t)
-      (sp-use-smartparens-bindings)
-      (sp-pair "\\(" nil :actions :rem)
-      (sp-pair "\\( " " \\)" :trigger "\\(")
-      (sp-pair "\\[ " " \\]" :trigger "\\[")
-      (sp-pair "\\\\( " " \\\\)" :trigger "\\\\(")
-      (sp-pair "\\\\[ " " \\\\]" :trigger "\\\\[")
-      (sp-local-pair 'latex-mode "\\left| " " \\right|" :trigger "\\l|")
-      (sp-local-pair 'latex-mode "\\left( " " \\right)" :trigger "\\l(")
-      (sp-local-pair 'latex-mode "\\left{ " " \\right}" :trigger "\\l{")
-      )
+      (use-package smartparens-config
+        :config
+        (smartparens-global-mode t)
+        (show-smartparens-global-mode t)
+  ;;       (sp-use-smartparens-bindings)
+        (sp-local-pair 'tex-mode "\\(" "\\)" :post-handlers '(:add " | "))
+        (sp-local-pair 'tex-mode "\\[" "\\]" :post-handlers '(:add " | "))
+        )
 #+END_SRC
 
 *** Expand region
@@ -842,7 +849,6 @@ backend provided by
     :config
     ;; (setq TeX-engine 'xetex
     ;;       exec-path (append exec-path '("/usr/texbin")))
-    (setenv "TEXINPUTS" ".:~/latex:")
     (setenv "PATH" (concat (getenv "PATH") ":/usr/texbin"))
     :init
     (add-hook 'LaTeX-mode-hook 
@@ -911,6 +917,7 @@ backend provided by
               )
     (setq reftex-plug-into-AUCTeX t)
     (setq reftex-label-regexps '("\\\\label{\\(?1:[^}]*\\)}"))
+    (setenv "TEXINPUTS" ".:~/.latexrc:")
     )
 
   (use-package auctex-latexmk
@@ -957,6 +964,17 @@ evironments to reference.
 ** Programming
 
 Mode specific to programming languages.
+*** Magit
+
+    Setup magit
+
+#+BEGIN_SRC emacs-lisp
+    (use-package magit-
+      :bind (("C-c g" . magit-status))
+      :config
+      (provide 'init-magit)
+      )
+#+END_SRC
 
 *** Magma
 
@@ -966,11 +984,11 @@ syntax highlighting and indentation as well as the ability to interact
 with a magma process.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package magma-mode
-      :mode "\\.m\\'"
-      ; :init
-      ; (add-to-list 'load-path "~/.emacs.d/site-lisp/magma-mode")
-      )
+  (use-package magma-mode
+    :mode "\\.m\\'"
+    ; :init
+    ; (add-to-list 'load-path "~/.emacs.d/site-lisp/magma-mode")
+    )
 #+END_SRC
 
 *** Haskell
@@ -978,12 +996,12 @@ with a magma process.
 Here I load Haskell mode. At the moment there is no fancy configuration.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package haskell-mode
-      :mode "\\.hs\\'"
-      :config
-      (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-      (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-        )
+  ;; (use-package haskell-mode
+  ;;   :mode "\\.hs\\'"
+  ;;   :config
+  ;;   (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+  ;;   (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+  ;;     )
 #+END_SRC
 
 *** Python
@@ -995,7 +1013,6 @@ I want to load python when I am editting sage files
     :mode "\\.sage\\'"
     :config
     (elpy-enable)
-    (elpy-use-ipython)
     )
 #+END_SRC
 
@@ -1094,15 +1111,15 @@ past it into the markdown file.
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
-   '(flyspell-duplicate ((t (:underline "DarkOrange"))))
-   '(flyspell-incorrect ((t (:background "#FFCCCC" :underline "Red1"))))
-   '(font-latex-math-face ((t (:foreground "#6E66B6"))))
-   '(highlight ((t (:background "#b5ffd1"))))
-   '(hl-line ((t (:background "#b5ffd1" :underline t))))
-   ;; '(helm-ff-dotted-directory ((t (:foreground "DarkRed"))))
-   '(isearch-fail ((t (:background "#ffcccc"))))
-   '(show-paren-match ((t (:background "#ff4500" :foreground "#e1e1e1" :weight bold)))) 
-   '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea"))))
+   ;; '(flyspell-duplicate ((t (:underline "DarkOrange"))))
+   ;; '(flyspell-incorrect ((t (:background "#FFCCCC" :underline "Red1"))))
+   ;; '(font-latex-math-face ((t (:foreground "#6E66B6"))))
+   ;; '(highlight ((t (:background "#b5ffd1"))))
+   ;; '(hl-line ((t (:background "#b5ffd1" :underline t))))
+   ;; ;; '(helm-ff-dotted-directory ((t (:foreground "DarkRed"))))
+   ;; '(isearch-fail ((t (:background "#ffcccc"))))
+   ;; '(show-paren-match ((t (:background "#ff4500" :foreground "#e1e1e1" :weight bold)))) 
+   ;; '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea"))))
    )
 #+END_SRC
 
@@ -1110,3 +1127,6 @@ past it into the markdown file.
    
 
    
+
+
+
