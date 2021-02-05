@@ -1,62 +1,13 @@
 #+TITLE: Emacs init file
 #+PROPERTY: header-args  :tangle yes
-#+OPTIONS: toc:3
-
-+ [[Emacs init]]
-  + [[Introduction]]
-  + [[Package management]]
-    + [[use-package]]
-    + [[Paradox]]
-  + [[Emacs appearance]]
-    + [[Window appearance]]
-    + [[Line numbering]]
-    + [[Theme]]
-    + [[Font]]
-    + [[Mode line]]
-  + [[Emacs behaviour]]
-    + [[Backups and autosaves]]
-    + [[Command history]]
-    + [[Save place in file]]
-    + [[Indentation and tabs]]
-    + [[Windmove]]
-    + [[Recent files]]
-    + [[Undo-tree]]
-    + [[Line breaking]]
-    + [[Spelling]]
-    + [[Helm]]
-    + [[Ivy]]
-    + [[Counsel]]
-    + [[Avy]]
-    + [[Swiper]]
-    + [[Hydra]]
-  + [[Editing]]
-    + [[Company]]
-    + [[Smartparens]]
-    + [[Expand region]]
-    + [[Yasnippet]]
-    + [[Projectile]]
-    + [[Tiny]]
-  + [[Org mode]]
-  + [[Markdown]]
-  + [[LaTeX]]
-    + [[AUCTeX]]
-    + [[RefTeX]]
-  + [[Programming]]
-    + [[Magit]]
-    + [[Magma]]
-    + [[Haskell]]
-    + [[Python]]
-  + [[Multiple major modes]]
-  + [[Key bindings]]
 
 * Emacs init
 ** Introduction
 
-This is my emacs init file. It written in markdown and then use =sed= to
-strip out the elisp in fenced code blocks. This is so that I can heavily
-comment on how certain things work. This file and the files it depends
-on are kept up-to-date in a
-[[https://github.com/noaham/dot_emacs][github repository]]. Hopefully
+This is my emacs init file. It is written in org-mode and 
+the code is extracted to a elisp file. This is so that I can 
+heavily comment on how certain things work. This file and the files it depends
+on are kept up-to-date in a [[https://github.com/noaham/dot_emacs][github repository]]. Hopefully
 someone will find this helpful.
 
 At the moment I am using Yamamoto Mitsuharu's
@@ -65,31 +16,37 @@ port has much better integration with OSX including full screen mode and
 pixel scrolling. You can obtain this version of emacs using
 [[http://brew.sh][homebrew]].
 
-This init file assumes that some directories exist such as
-=~/.emacs.d/snippets= and =~/.emacs.d/themes= as well as some theme
-files being available so it is best to obtain the entire
-[[https://github.com/noaham/dot_emacs][github repository]].
+The very first thing we do is increase the garbage collection limit for emacs during init and then set it back to the default value
 
-TODO:
-
--  Tidy up auctex conifg
--  write color theme for company
+#+BEGIN_SRC emacs-lisp
+  ;; (setq gc-cons-threshold 1000000000)
+  ;; (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold 800000)))
+#+END_SRC
 
 ** Package management
 
-The very first thing we do is set up [[http://cask.github.io][cask]] and
-[[https://github.com/rdallasgray/pallet][pallet]]. These two utilities
-work in tandem to keep track of packages which I use and to make sure
-they are installed when emacs starts. The [[./Cask][Cask]] file defines
-which repositories package should use and which packages should be
-installed.
+The very first thing we do is set up package management. I am using [[https://github.com/raxod502/straight.el][straight.el]] to replace the in-built
+package.el. My main gripe with package.el is that it loads all packages that are installed. Straight 
+only loads those that are in the init file.
+
+*** straight.el
+
+First we bootstrap straight. This will check if straight is installed, and if not will install it.
 
 #+BEGIN_SRC emacs-lisp
-    (package-initialize)
-    (require 'cask)
-    (cask-initialize)
-    (require 'pallet)
-    (pallet-mode t)
+  (setq straight-recipes-gnu-elpa-use-mirror t)
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
 #+END_SRC
 
 *** use-package
@@ -121,23 +78,17 @@ It is probably best to see the use-package website or below for
 examples.
 
 #+BEGIN_SRC emacs-lisp
-    (require 'use-package)
-    (setq use-package-verbose t
-          use-package-idle-interval 10)
+  (straight-use-package 'use-package)
 #+END_SRC
 
-*** Paradox
+*** init profiling
 
-[[https://github.com/Bruce-Connor/paradox][Paradox]] is a nice package
-which cleans up the package-list buffer. It lists github stars and can
-also integrate with my github if I supply it wit a provate github token
-so that I can star repositories from the package men, but I don't want
-this so I set =paradox-github-token= to =t=.
+It is useful sometimes to analyse how long init is taking on certain things. [[https://github.com/jschaf/esup][esup]] is the package to do this
 
 #+BEGIN_SRC emacs-lisp
-    ; (use-package paradox
-    ;   :config
-    ;   (setq paradox-github-token t))
+  (use-package esup
+      :straight t
+      )
 #+END_SRC
 
 ** Emacs appearance
@@ -153,10 +104,18 @@ Emacs by default starts quite small. I used to change this so that it
 started reasonably large (left two thirds of the screen).
 
 #+BEGIN_SRC emacs-lisp
-    (setq default-frame-alist '((top + 0) 
-                    (left + 0) 
-                    (height . 100) 
-                    (width . 120)))
+  (setq default-frame-alist '((top + 0) 
+                              (left + 0) 
+                              (height . 100) 
+                              (width . 120)
+                              (font . "Roboto Mono:style=Light:size=12")
+                              (internal-border-width . 0)
+                              (left-fringe    . 18)
+                              (right-fringe   . 18)
+                              ))
+  (set-face-attribute 'fringe nil
+                        :background "white"
+                        )
 #+END_SRC
 
 We do not need tool bars or scroll bars so we turn them off.
@@ -173,118 +132,53 @@ doesn't serve much of a purpose.
     (setq inhibit-startup-message t)
 #+END_SRC
 
-*** Line numbering
+*** Mode line
 
-Line numbering is also sometimes useful. At the moment it is off by
-default. I go through phases of wanting it and not wanting it. Hence at
-the moment it is commented out but it can be started on a per buffer
-basis with =M-x linum-mode= or globally with =M-x global-linum-mode=.
+Some basic appearence settings for the mode line.
 
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package linum
-  ;;   :init
-  ;;   (global-linum-mode -1))
+  (set-face-attribute 'mode-line nil
+                      :weight 'light
+                      :foreground "grey20"
+                      :background "grey90"
+                      :box '(:line-width -1 :color "grey75" :style nil)
+                      )
 #+END_SRC
 
 *** Theme
 
-Here we load the color theme for emacs. I really enjoy the
-[[https://github.com/chriskempson/base16][base16 themes]].
-
-First we add the =themes= directory to the load-path and then set the
-theme. The keyword =:no-confirm= means that emacs wont constantly ask if
-it is safe to run the lisp code in the theme.
+Some basic theme options. They are commented out as I do not use a theme usually.
 
 #+BEGIN_SRC emacs-lisp
-  ; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-  ; (load-theme 'mccarthy :no-confirm)
-  ; (load-theme 'base16-eighties-dark :no-confirm)
-  ; (add-to-list 'load-path "~/.emacs.d/themes/emacs-doom-theme")
-  ; (load-theme 'dracula :no-confirm)
-  (use-package doom-themes
-    :config
-    (load-theme 'doom-one t)
-    (doom-themes-visual-bell-config)
-    (doom-themes-neotree-config)
-    (doom-themes-org-config)
-    )
-  (use-package solaire-mode
-    :hook ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
-    :config
-    (add-hook 'minibuffer-setup-hook #'solaire-mode-in-minibuffer)
-    (solaire-mode-swap-bg))
-#+END_SRC
-
-*** Font
-
-Change the default font to Menlo. Ideally I should check that this is
-actually installed but I haven't got around to doing this.
-
-#+BEGIN_SRC emacs-lisp
-    (add-to-list 'default-frame-alist '(font . "Menlo-12")) 
-#+END_SRC
-
-*** Mode line
-
-The default mode line is ugly and cluttered.
-[[https://github.com/Bruce-Connor/smart-mode-line][Smart-mode-line]] is
-a nice solution which make the mode line a bit more readable. There are
-light and dark themes but I like to use respectful which respects my
-current choice of color theme. The variable =sml/hidden-modes= takes a
-regex argument and hides all matching minor modes, since I don't want to
-see any minor modes I hide them all.
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package smart-mode-line
+  ;; (use-package modus-themes
+  ;;   :straight t
   ;;   :config
-  ;; ;  (load-theme 'smart-mode-line-respectful :no-confirm)
-  ;;   (setq sml/theme nil
-  ;;         rm-blacklist "\\([A-z]\\|[-]\\)*")
-  (use-package doom-modeline
-        :ensure t
-        :defer t
-        :hook (after-init . doom-modeline-init));;   (sml/setup))
+  ;;   (load-theme 'modus-operandi t)
+  ;;   )
+
+  ;; (use-package nord-theme
+  ;;   :straight t
+  ;;   :init
+  ;;   :config
+  ;;   (load-theme 'nord t)
+  ;;   )
+
+  ;; (use-package solo-jazz-theme
+  ;;   :straight t
+  ;;   :init
+  ;;   :config
+  ;;   (load-theme 'solo-jazz t)
+  ;;   )
 #+END_SRC
 
 ** Emacs behaviour
-
-The following are just some settings affecting the general behaviou of
-emacs.
-
-The bell is annoying so we turn it off.
-
-#+BEGIN_SRC emacs-lisp
-    (setq ring-bell-function 'ignore)
-#+END_SRC
-
+*** Delete selection
 Default behavious is for emacs not to overwrite a selection.
 =delete-selection-mode= changes this.
 
 #+BEGIN_SRC emacs-lisp
     (delete-selection-mode)
 #+END_SRC
-
-*** Backups and autosaves
-
-The way emacs handles backup file is annoying also. It saves a file
-ending in ="~"=. We could just turn this off but Almost certaily I will
-regret this at some point when I loose some data. Hence we just stick
-all backups in a directory =~/.emacs.d/backups= and the same with
-autosave files in =~/.emacs.d/autosaves=. We also turn on version
-control so we keep a number of backup files.
-
-#+BEGIN_SRC emacs-lisp
-  ;; (setq backup-by-copying t 
-  ;;       backup-directory-alist
-  ;;       '((".*" . "~/.emacs.d/backups")) 
-  ;;       auto-save-file-name-transforms
-  ;;       '((".*" "~/.emacs.d/autosaves/" t)) 
-  ;;       delete-old-versions t
-  ;;       kept-new-versions 6
-  ;;       kept-old-versions 2
-  ;;       version-control t)
-#+END_SRC
-
 *** Command history
 
 Saving command history across emacs sessions is really useful. History
@@ -293,14 +187,7 @@ have =savehist-mode= activated after costomising =savehist-file= (which
 I haven't done here), otherwise the history is cleared.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package savehist
-      :config
-      (savehist-mode 1)
-      (setq history-length 100
-            history-delete-duplicates t
-            savehist-additional-variables '(search-ring
-                                            regexp-search-ring))
-    )
+  ;; (savehist-mode 1)
 #+END_SRC
 
 *** Save place in file
@@ -314,39 +201,10 @@ buffer-local variable =save-place= can be set globally using
 file of the same name.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package saveplace
-      :init
-      (setq save-place-file "~/.emacs.d/places")
-      (setq-default save-place t)
-      (save-place-mode t))
-#+END_SRC
-
-*** Indentation and tabs
-
-Tab characters are annoying so we turn them off and make sure the
-default indent is 4 spaces. We also bind the return key to newline and
-indent.
-
-#+BEGIN_SRC emacs-lisp
-    (setq-default tab-width 4)
-    (setq-default indent-tabs-mode nil)
-    (global-set-key (kbd "RET") 'newline-and-indent)
-#+END_SRC
-
-*** Windmove
-
-[[http://www.emacswiki.org/emacs/WindMove][Windmove]] is a mode that
-lets you move buffers with =Shift-<arrow>= which is much easier than
-=C-x o=. This conflicts with =markdown-promote= but I don't use this
-often enough to car. Requiring windmove gives access to the functions
-=windmove-up= etc but the command =windmove-default-keybindings= sets
-the =Shift-<arrow>= bindings.
-
-#+BEGIN_SRC emacs-lisp
-    (use-package windmove
-      :config
-      (windmove-default-keybindings)
-      )
+  (use-package saveplace
+    :init
+    (save-place-mode t)
+    )
 #+END_SRC
 
 *** Recent files
@@ -362,13 +220,24 @@ I would like the file where recentf keeps its records to be in my
 after customising this variable as otherwise it doesn't work.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package recentf
+  (use-package recentf
+      :init
+      (setq recentf-max-saved-items 300)
       :config
-      (setq recentf-save-file "~/.emacs.d/.recentf")
       (recentf-mode t)
-      (setq recentf-max-menu-items 5000)
-      (add-to-list 'recentf-exclude "\\.emacs.d/.cask/")
       )
+#+END_SRC
+
+*** Indentation and tabs
+
+Tab characters are annoying so we turn them off and make sure the
+default indent is 4 spaces. We also bind the return key to newline and
+indent.
+
+#+BEGIN_SRC emacs-lisp
+    (setq-default tab-width 4)
+    (setq-default indent-tabs-mode nil)
+    (global-set-key (kbd "RET") 'newline-and-indent)
 #+END_SRC
 
 *** Undo-tree
@@ -379,7 +248,8 @@ replaces the keybinding =C-x u= and calls a graphical interface to
 navigating undo's and redo's in a tree structure.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package undo-tree
+  (use-package undo-tree
+      :straight t
       :config
       (global-undo-tree-mode)
       )
@@ -395,308 +265,53 @@ acheives this nicely.
 #+BEGIN_SRC emacs-lisp
     (global-visual-line-mode 1)
 #+END_SRC
+*** Selectrum
 
-*** Spelling
-
-The package [[http://www.emacswiki.org/emacs/FlySpell][flyspell]]
-enables on-the-fly spell checking. It is fairly intelligent and ignores
-latex commands etc. my default keybinding to correct the word at point
-is =C-'=.
-
-We also make sure flyspell starts by default in LaTeX and markdown
-modes.
+[[https://github.com/raxod502/selectrum][Selectrum]] is an incremental narrowing framework, like ivy or helm. It seems at the moment quicker, lighter and less obtrusive in emacs.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package flyspell
-      :bind
-      ("C-'" . ispell-word)
-      :config
-        (setq ispell-program-name "aspell")
-        (setq ispell-dictionary "british")
-        (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-        (add-hook 'markdown-mode-hook 'flyspell-mode)
-        )
-#+END_SRC
-
-*** Neotree
-
-#+BEGIN_SRC emacs-lisp
-  (use-package neotree
-    :init
-    (setq neo-smart-open t)
+  (use-package selectrum
+    :straight t
+    :config (selectrum-mode t)
     )
 #+END_SRC
 
-*** Helm
-
-[[https://github.com/emacs-helm/helm][Helm]] is a completion and search
-package for emacs. It is kind of difficult to explain what it is, so
-just check out the website. I have stopped using this in favour of the
-lighter and quicker ivy. Hence the code is commented.
-
-I set =helm-mode-reverse-history= to =nil= as otherwise the history of
-whatever command I am running is shown after the normal set of
-completions. Normally when I run a command I have run it recently so
-this makes sense.
+We will also use [[https://github.com/raxod502/prescient.el][prescient.el]] which will remember the most recently used commands and sort them to the top of the list.
 
 #+BEGIN_SRC emacs-lisp
-    ; (use-package helm
-    ;   :bind (("M-x" . helm-M-x)
-    ;          ("M-y" . helm-show-kill-ring)
-    ;          ("C-x b" . helm-mini)
-    ;          ("C-x C-f" . helm-find-files)
-    ;          ("C-x C-b" . helm-buffers-list)
-    ;          ("C-x C-r" . helm-recentf))
-    ;   :config
-    ;   (require 'helm-config)
-    ;   (setq helm-mode-reverse-history nil)
-    ;   (helm-mode 1)
-    ;   (setq helm-locate-command "mdfind -onlyin $HOME -name %s %s | grep -v \"$HOME/Library\" ")
-    ;   (setq helm-truncate-lines t)
-    ;   )
+  (use-package selectrum-prescient
+    :straight t
+    :config
+    (selectrum-prescient-mode t)
+    (prescient-persist-mode t)
+    )
 #+END_SRC
 
-*** Ivy
+*** Consult
 
-[[https://github.com/abo-abo/swiper][Ivy]] is a completion framework
-like ido or helm. It is lightweight and easy to use. The variable
-'ivy-height' controls how many lines are shown in the minibuffer when
-completing candidates.
+[[https://github.com/minad/consult][Consult]] is a collection of useful commands.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package ivy
-      :init (ivy-mode 1)
-      :bind ("C-x b" . ivy-switch-buffer)
-      :config (setq ivy-height 15)
-      )
+  (use-package consult
+    :straight t
+    :bind (("C-c o" . consult-outline)
+           ("C-x b" . consult-buffer)
+           ("C-x C-r" . consult-recent-file)
+           ("C-s" . consult-line)
+           )
+    )
+#+END_SRC
+*** Marginalia
+
+[[https://github.com/minad/marginalia/][Marginalia]] add context info to some lists. For example it adds key bindings to the M-x list.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package marginalia
+    :straight t
+    :config (marginalia-mode)
+    )
 #+END_SRC
 
-*** Counsel
-
-[[https://github.com/abo-abo/swiper][Counsel]] is an add on to ivy.
-
-#+BEGIN_SRC emacs-lisp
-    (use-package counsel
-      :bind (("M-x" . counsel-M-x)
-             ("C-x C-f" . counsel-find-file)
-             ("C-h f" . counsel-describe-function)
-             ("C-h v" . counsel-describe-variable)
-             ("M-y" . counsel-yank-pop)
-             ("C-x C-r" . counsel-recentf))
-      )
-#+END_SRC
-
-*** Avy
-
-[[https://github.com/abo-abo/avy][Avy]] is a minor mode for jumping
-around the buffer. The way it works is, find the word you want to jump
-to the start of. Call =avy-goto-char=, this asks for the =char=, i.e.
-the character you want to jump to. When entered, this will change the
-character you want to move to, to a red letter. Type this letter and you
-will be magically transported there! If too many options exits, avy
-builds a tree which takes you there.
-
-The other functions =avy-goto-char2= and =avy-goto-line= work the same
-except for two chars and lines respectively.
-
-#+BEGIN_SRC emacs-lisp
-    (use-package avy
-      :bind (("C-c SPC" . avy-goto-char)
-             ("C-c b" . avy-goto-char-2)
-             ("C-c v" . avy-goto-line))
-      )
-#+END_SRC
-
-*** Swiper
-
-[[https://github.com/abo-abo/swiper][Swiper]] is a minor mode which
-improves the standard regex search. It uses ivy to show a list of
-options which you can choose from.
-
-#+BEGIN_SRC emacs-lisp
-    (use-package swiper
-      :bind (("C-s" . swiper)
-             ("C-r" . swiper))
-      )
-#+END_SRC
-
-*** Hydra
-
-[[https://github.com/abo-abo/hydra][Hydra]] is a package to create
-useful interfaces to complex keybindings.
-
-#+BEGIN_SRC emacs-lisp
-    (use-package hydra
-      )
-#+END_SRC
-
-Here are my hydras. Most of them are stolen from other sources.
-
-#+BEGIN_SRC emacs-lisp
-    (defhydra hydra-buffer-menu (:color pink
-                                 :hint nil)
-      "
-    ^Mark^             ^Unmark^           ^Actions^          ^Search
-    ^^^^^^^^-----------------------------------------------------------------
-    _m_: mark          _u_: unmark        _x_: execute       _R_: re-isearch
-    _s_: save          _U_: unmark up     _b_: bury          _I_: isearch
-    _d_: delete        ^ ^                _g_: refresh       _O_: multi-occur
-    _D_: delete up     ^ ^                _T_: files only: % -28`Buffer-menu-files-only
-    _~_: modified
-    "
-      ("m" Buffer-menu-mark)
-      ("u" Buffer-menu-unmark)
-      ("U" Buffer-menu-backup-unmark)
-      ("d" Buffer-menu-delete)
-      ("D" Buffer-menu-delete-backwards)
-      ("s" Buffer-menu-save)
-      ("~" Buffer-menu-not-modified)
-      ("x" Buffer-menu-execute)
-      ("b" Buffer-menu-bury)
-      ("g" revert-buffer)
-      ("T" Buffer-menu-toggle-files-only)
-      ("O" Buffer-menu-multi-occur :color blue)
-      ("I" Buffer-menu-isearch-buffers :color blue)
-      ("R" Buffer-menu-isearch-buffers-regexp :color blue)
-      ("c" nil "cancel")
-      ("v" Buffer-menu-select "select" :color blue)
-      ("o" Buffer-menu-other-window "other-window" :color blue)
-      ("q" quit-window "quit" :color blue)
-      )
-
-    (define-key Buffer-menu-mode-map "." 'hydra-buffer-menu/body)
-
-
-    (defhydra hydra-move (:color pink :hint nil)
-      "
-    _n_: next line     _f_: forward char  _F_: forward word  _a_: beginning line _v_: scroll up 
-    _p_: previous line _b_: backward char _B_: backward word _e_: end line       _V_: scroll down
-    _l_: re-center
-
-    "
-      ("n" next-line)
-      ("p" previous-line)
-      ("f" forward-char)
-      ("b" backward-char)
-      ("F" forward-word)
-      ("B" backward-word)
-      ("a" beginning-of-line)
-      ("e" move-end-of-line)
-      ("v" scroll-up-command)
-      ;; Converting M-v to V here by analogy.
-      ("V" scroll-down-command)
-      ("l" recenter-top-bottom)
-      ("q" nil "quit" :color blue))
-
-    (global-set-key (kbd "M-n") 'hydra-move/body)
-
-    (defhydra hydra-org-move (:color pink :hint nil)
-      "
-    _n_ext heading     _f_orward same level  _u_p level
-    _p_revious heading _b_: back same level  _j_:ump
-
-    "
-      ("n" outline-next-visible-heading)
-      ("p" outline-previous-visible-heading)
-      ("f" org-forward-heading-same-level)
-      ("b" org-backward-heading-same-level)
-      ("u" outline-up-heading)
-      ("j" org-goto :color blue)
-      ("q" nil "quit" :color blue))
-
-    (global-set-key (kbd "C-c M-n") 'hydra-org-move/body)
-
-    (global-set-key (kbd "M-p") 'hydra-sp/body)
-
-    (defhydra hydra-sp (:hint nil)
-      "
-      _B_ backward-sexp            -----
-      _F_ forward-sexp               _s_ splice-sexp
-      _L_ backward-down-sexp         _df_ splice-sexp-killing-forward
-      _H_ backward-up-sexp           _db_ splice-sexp-killing-backward
-    ^^------                         _da_ splice-sexp-killing-around
-      _k_ down-sexp                -----
-      _j_ up-sexp                    _C-s_ select-next-thing-exchange
-    -^^-----                         _C-p_ select-previous-thing
-      _n_ next-sexp                  _C-n_ select-next-thing
-      _p_ previous-sexp            -----
-      _a_ beginning-of-sexp          _C-f_ forward-symbol
-      _z_ end-of-sexp                _C-b_ backward-symbol
-    --^^-                          -----
-      _t_ transpose-sexp             _c_ convolute-sexp
-    -^^--                            _g_ absorb-sexp
-      _x_ delete-char                _q_ emit-sexp
-      _dw_ kill-word               -----
-      _dd_ kill-sexp                 _,b_ extract-before-sexp
-    -^^--                            _,a_ extract-after-sexp
-      _S_ unwrap-sexp              -----
-    -^^--                            _AP_ add-to-previous-sexp
-      _C-h_ forward-slurp-sexp       _AN_ add-to-next-sexp
-      _C-l_ forward-barf-sexp      -----
-      _C-S-h_ backward-slurp-sexp    _ join-sexp
-      _C-S-l_ backward-barf-sexp     _|_ split-sexp
-    "
-      ;; TODO: Use () and [] - + * | <space>
-      ("B" sp-backward-sexp );; similiar to VIM b
-      ("F" sp-forward-sexp );; similar to VIM f
-      ;;
-      ("L" sp-backward-down-sexp )
-      ("H" sp-backward-up-sexp )
-      ;;
-      ("k" sp-down-sexp ) ; root - towards the root
-      ("j" sp-up-sexp )
-      ;;
-      ("n" sp-next-sexp )
-      ("p" sp-previous-sexp )
-      ;; a..z
-      ("a" sp-beginning-of-sexp )
-      ("z" sp-end-of-sexp )
-      ;;
-      ("t" sp-transpose-sexp )
-      ;;
-      ("x" sp-delete-char )
-      ("dw" sp-kill-word )
-      ;;("ds" sp-kill-symbol ) ;; Prefer kill-sexp
-      ("dd" sp-kill-sexp )
-      ;;("yy" sp-copy-sexp ) ;; Don't like it. Pref visual selection
-      ;;
-      ("S" sp-unwrap-sexp ) ;; Strip!
-      ;;("wh" sp-backward-unwrap-sexp ) ;; Too similar to above
-      ;;
-      ("C-h" sp-forward-slurp-sexp )
-      ("C-l" sp-forward-barf-sexp )
-      ("C-S-h" sp-backward-slurp-sexp )
-      ("C-S-l" sp-backward-barf-sexp )
-      ;;
-      ;;("C-[" (bind (sp-wrap-with-pair "[")) ) ;;FIXME
-      ;;("C-(" (bind (sp-wrap-with-pair "(")) )
-      ;;
-      ("s" sp-splice-sexp )
-      ("df" sp-splice-sexp-killing-forward )
-      ("db" sp-splice-sexp-killing-backward )
-      ("da" sp-splice-sexp-killing-around )
-      ;;
-      ("C-s" sp-select-next-thing-exchange )
-      ("C-p" sp-select-previous-thing)
-      ("C-n" sp-select-next-thing)
-      ;;
-      ("C-f" sp-forward-symbol )
-      ("C-b" sp-backward-symbol )
-      ;;
-      ;;("C-t" sp-prefix-tag-object)
-      ;;("H-p" sp-prefix-pair-object)
-      ("c" sp-convolute-sexp )
-      ("g" sp-absorb-sexp )
-      ("q" sp-emit-sexp )
-      ;;
-      (",b" sp-extract-before-sexp )
-      (",a" sp-extract-after-sexp )
-      ;;
-      ("AP" sp-add-to-previous-sexp );; Difference to slurp?
-      ("AN" sp-add-to-next-sexp )
-      ;;
-      ("_" sp-join-sexp ) ;;Good
-      ("|" sp-split-sexp )) 
 #+END_SRC
 
 ** Editing
@@ -705,428 +320,46 @@ In this section I load packages useful for general editing
 
 *** Company
 
-For global auto-completion I use
-[[http://company-mode.github.io][company-mode]].
+For global auto-completion I use [[http://company-mode.github.io][company-mode]].
 
-I used to use
-[[http://cx4a.org/software/auto-complete/][auto-complete-mode]], but I
-found it slow and a little buggy. Company seems quicker, a little less
-feature rich but that is ok for my purposes. You can flick back through
-older commits to see my
-[[http://cx4a.org/software/auto-complete/][auto-complete-mode]] config
-and comments about it.
+I used to use [[http://cx4a.org/software/auto-complete/][auto-complete-mode]], but I found it slow and a little buggy. Company seems quicker, a little less feature rich but that is ok for my purposes. You can flick back through older commits to see my [[http://cx4a.org/software/auto-complete/][auto-complete-mode]] config and comments about it.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package company
-      :config
-      (add-hook 'after-init-hook 'global-company-mode)
-      (bind-key "C-n" 'company-select-next company-active-map)
-      (bind-key "C-p" 'company-select-previous company-active-map)
-      )
+  (use-package company
+    :straight t
+    :bind (:map company-active-map
+                ("C-n" . company-select-next-or-abort)
+                ("C-p" . company-select-previous-or-abort))
+    :config
+    (add-hook 'after-init-hook 'global-company-mode)
+    )
 #+END_SRC
 
-*** Smartparens
+*** Parenthesis matchcing
 
-[[https://github.com/Fuco1/smartparens][Smartparens-mode]] is a mode for
-intelligent parenthesis (and other pairs) matching. It is ver extensible
+I use the inbuild electric-pair-mode, which works fine for my basic needs. 
+
+[[https://github.com/Fuco1/smartparens][Smartparens-mode]] is another mode for
+intelligent parenthesis (and other pairs) matching. It is very extensible
 and you can define your own pairs. It has some nifty navigation commands
-which I should learn at some point and make key bindings for.
-
-To define custom pairs the syntax at its most basic is
-=(sp-local-pair MODE "LEFT" "RIGHT")= we can add =:actions :rem= and
-substitute =nil= for ="RIGHT"= to delete the definition of a pair
-locally.
+but probably is too much for my uses at the moment.
 
 #+BEGIN_SRC emacs-lisp
-      (use-package smartparens-config
-        :config
-        (smartparens-global-mode t)
-        (show-smartparens-global-mode t)
-  ;;       (sp-use-smartparens-bindings)
-        (sp-local-pair 'tex-mode "\\(" "\\)" :post-handlers '(:add " | "))
-        (sp-local-pair 'tex-mode "\\[" "\\]" :post-handlers '(:add " | "))
-        )
-#+END_SRC
-
-*** Expand region
-
-Selecting regions intelligently is very useful,
-[[https://github.com/magnars/expand-region.el][Expand region]] allows to
-to incrementally increas and decrease the region selected in a smart
-way. Because this is so useful I have bound =er/expand-region= to =C-==
-and =er/contract-region= to =C-+=. This is not intuitive.
-
-#+BEGIN_SRC emacs-lisp
-    (use-package expand-region
-      :bind (("C-=" . er/expand-region)
-             ("C-+" . er/contract-region))
-      )
-#+END_SRC
-
-*** Yasnippet
-
-[[https://github.com/capitaomorte/yasnippet][Yasnippet]] is a template
-system. I use it mostly with LaTeX. Personal snippets are saved in
-=~/.emacs.d/snippets=, this is the default place.
-
-#+BEGIN_SRC emacs-lisp
-    (use-package yasnippet)
-#+END_SRC
-
-*** Projectile
-
-[[https://github.com/bbatsov/projectile][Projectile]] is a project
-interaction library for emacs.
-
-#+BEGIN_SRC emacs-lisp
-    (use-package projectile
-      :config
-      (projectile-global-mode)
-      (setq projectile-completion-system 'ivy)
-      )
-
-    ; (use-package helm-projectile)
-#+END_SRC
-
-*** Tiny
-
-[[https://github.com/abo-abo/tiny][Tiny]] is a small package to expand sequence of numbers. It is pretty handy.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package tiny
-    )
-#+END_SRC
-
-** Org mode
-   
-In this section I include all my default org mode configurations. At the moment all that is done is to automatically color source blocks
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org
-    :defer t
-    :init
-    (setq org-src-fontify-natively t)
-    )
-#+END_SRC
-
-** Markdown
-
-I use
-[[https://github.com/milkypostman/markdown-mode-plus][markdown-mode+]],
-which is an extension of
-[[http://jblevins.org/projects/markdown-mode/][markdown-mode]].
-
-#+BEGIN_SRC emacs-lisp
-    (use-package markdown-mode
-      :mode "\\.md\\'"
-      )
+  (electric-pair-mode t)
+  (show-paren-mode t)
 #+END_SRC
 
 ** LaTeX
 
-Since I am a mathematician I use latex a lot hence lots of configuration
-to do.
+I use latex a lots
 
-*** AUCTeX
-
-[[http://www.gnu.org/software/auctex/][AUCTeX]] is the major mode for
-editing LaTeX files. Here I first make sure that emacs recognises
-XeLaTeX and has latex in its load path. Then I load various sources for
-auto-complete. I also set up some default environments which I use a lot
-and have it load the =ac-math= and =auto-complete-auctex= packages.
-
-I used to use [[https://github.com/vitoshka/ac-math][ac-math]] and
-[[https://github.com/monsanto/auto-complete-auctex][auto-complete-auctex]]
-to add auto-complete sources for common math symbols and auctex commands
-in auto-complete. These packages were very slow to load and didn't add
-much value. I have started using company-mode, thus I load the company
-backend provided by
-[[https://github.com/alexeyr/company-auctex/][company-auctex]].
+*** AucTeX
 
 #+BEGIN_SRC emacs-lisp
-  (use-package auctex
+  (use-package tex
+    :straight auctex
     :defer t
     :config
-    ;; (setq TeX-engine 'xetex
-    ;;       exec-path (append exec-path '("/usr/texbin")))
-    (setenv "PATH" (concat (getenv "PATH") ":/usr/texbin"))
-    :init
-    (add-hook 'LaTeX-mode-hook 
-              (lambda() 
-                (add-to-list 
-                 'TeX-command-list 
-                 '("XeLaTeX" "%`xelatex%(mode) --shell-escape%' %t" TeX-run-TeX nil t))
-                (setq
-                 ;; Set the list of viewers for Mac OS X.
-                 TeX-view-program-list
-                 '(("Preview.app" "open -a Preview.app %o")
-                   ("Skim" "displayline -b -g %n %o %b")
-                   ("displayline" "displayline %n %o %b")
-                   ("open" "open %o"))
-                 ;; Select the viewers for each file type.
-                 TeX-view-program-selection
-                 '((output-dvi "open")
-                   (output-pdf "Skim")
-                   (output-html "open")))
-                  ))
-    (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-    (add-hook 'LaTeX-mode-hook
-              (lambda ()
-                (setq TeX-command-default "LaTexMk"
-                      TeX-save-query nil 
-                      TeX-show-compilation nil)))
-    (add-hook 'LaTeX-mode-hook
-              (lambda ()
-                (LaTeX-add-environments
-                 '("Theorem" LaTeX-env-label)
-                 '("Lemma" LaTeX-env-label)
-                 '("proof" LaTeX-env-label)
-                 '("Proposition" LaTeX-env-label)
-                 '("Definition" LaTeX-env-label)
-                 '("Example" LaTeX-env-label)
-                 '("Exercise" LaTeX-env-label)
-                 '("Conjecture" LaTeX-env-label)
-                 '("Corollary" LaTeX-env-label)
-                 '("Remark" LaTeX-env-label)
-                 '("Problem" LaTeX-env-label)
-                 )))
-    (add-hook 'LaTeX-mode-hook
-              (lambda ()
-                (add-to-list 'LaTeX-label-alist '("Theorem" . "thm:"))
-                (add-to-list 'LaTeX-label-alist '("Lemma" . "lem:"))
-                (add-to-list 'LaTeX-label-alist '("Proposition" . "prp"))
-                (add-to-list 'LaTeX-label-alist '("Definition" . "def:"))
-                (add-to-list 'LaTeX-label-alist '("Example" . "exm:"))
-                (add-to-list 'LaTeX-label-alist '("Exercise" . "exr:"))
-                (add-to-list 'LaTeX-label-alist '("Conjecture" . "coj:"))
-                (add-to-list 'LaTeX-label-alist '("Corollary" . "cor:"))
-                (add-to-list 'LaTeX-label-alist '("Remark" . "rem:"))
-                (add-to-list 'LaTeX-label-alist '("Problem" . "prb:"))
-                )
-              )
-    (add-hook 'LaTeX-mode-hook
-              (lambda ()
-                (yas-minor-mode)
-                (company-auctex-init)
-                (flyspell-mode)
-                (TeX-PDF-mode 1)
-                ;; (setq TeX-source-correlate-mode t)
-                ;; (setq TeX-source-correlate-start-server t)
-                ;; (setq TeX-source-correlate-method 'synctex)
-                )
-              )
-    (setq reftex-plug-into-AUCTeX t)
-    (setq reftex-label-regexps '("\\\\label{\\(?1:[^}]*\\)}"))
-    (setenv "TEXINPUTS" ".:~/.latexrc:")
-    )
-
-  (use-package auctex-latexmk
-    :init
-    (auctex-latexmk-setup)
+    (setq LaTeX-electric-left-right-brace t)
     )
 #+END_SRC
-
-*** RefTeX
-
-[[http://www.gnu.org/software/auctex/reftex.html][RefTeX]] is a
-reference and citation manager for AUCTeX. I set
-=reftex-plug-into-AUCTeX= so that it behaves well with AUCTeX, setting
-=reftex-ref-macro-prompt= to =nil= gets rid of the annoying prompt when
-seaching for references and setting =reftex-bibliography-commands=
-allows me to use the =\addbibresource= command in my LaTeX documents.
-=reftex-label-alist= gives me quick access to looking for specific
-evironments to reference.
-
-#+BEGIN_SRC emacs-lisp
-    (use-package reftex
-    ;  :defer t
-      :config
-      (setq reftex-plug-into-AUCTeX t
-            reftex-ref-macro-prompt nil
-            reftex-bibliography-commands '("bibliography"
-                                           "nobibliography"
-                                           "addbibresource")
-            reftex-insert-label-flags '(t t)
-            reftex-label-alist
-            '(("Theorem" ?h "thm:" "~\\ref{%s}" nil ("Theorem" "thm."))
-              ("Lemma" ?l "lem:" "~\\ref{%s}" t ("Lemma" "lem."))
-              ("Proposition" ?p "prp:" "~\\ref{%s}" t ("Proposition" "prp."))
-              ("Definition" ?d "def:" "~\\ref{%s}" t ("Definition" "def."))
-              ("Example" ?x "exm:" "~\\ref{%s}" t ("Example" "exm."))
-              ("Exercise" ?E "exr:" "~\\ref{%s}" t ("Exercise" "exr."))
-              ("Conjecture" ?C "coj:" "~\\ref{%s}" t ("Conjecture" "coj."))
-              ("Corollary" ?c "cor:" "~\\ref{%s}" t ("Corollary" "cor."))
-              ("Remark" ?r "rem:" "~\\ref{%s}" t ("Remark" "rem."))
-              ("Problem" ?o "prb:" "~\\ref{%s}" t ("Remark" "prb.")))
-            ))
-#+END_SRC
-
-** Programming
-
-Mode specific to programming languages.
-*** Magit
-
-    Setup magit
-
-#+BEGIN_SRC emacs-lisp
-    (use-package magit-
-      :bind (("C-c g" . magit-status))
-      :config
-      (provide 'init-magit)
-      )
-#+END_SRC
-
-*** Magma
-
-Magma is a computer algebra package, the package
-[[https://github.com/ThibautVerron/magma-mode][magma-mode]] provides
-syntax highlighting and indentation as well as the ability to interact
-with a magma process.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package magma-mode
-    :mode "\\.m\\'"
-    ; :init
-    ; (add-to-list 'load-path "~/.emacs.d/site-lisp/magma-mode")
-    )
-#+END_SRC
-
-*** Haskell
-
-Here I load Haskell mode. At the moment there is no fancy configuration.
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package haskell-mode
-  ;;   :mode "\\.hs\\'"
-  ;;   :config
-  ;;   (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-  ;;   (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-  ;;     )
-#+END_SRC
-
-*** Python
-
-I want to load python when I am editting sage files
-
-#+BEGIN_SRC emacs-lisp
-  (use-package elpy
-    :mode "\\.sage\\'"
-    :config
-    (elpy-enable)
-    )
-#+END_SRC
-
-** Multiple major modes
-
-Often it is useful to have mutliple major modes in a single buffer. This
-markdown file is an example. I want to be able to edit the markdown in
-markdown-mode and the elisp in emacs-lisp-mode. To achieve this I use
-[[https://github.com/purcell/mmm-mode][mmm-mode]].
-
-We don't have both major modes activated at once. Instead mmm-mode
-seperates the major modes into different regions of the buffer. A
-submode defines a set of major modes which can be activated in regions
-of a buffer which can be described unsing regex.
-
-For example, below I use =mmm-add-class= to add such a submode called
-"markdown". It recognised regions of fenced code blocks (the regex
-defining this is set by =:front= and =:back=), the =:front= regex is
-then fed into the function =mmm-markdown-get-mode= detirmines which
-major mode to use. For example
-
-would be detected as a region which should use python-mode. To have
-mmm-mode scan the buffer for regions to mmm-ify, use the function
-=mmm-parse-buffer= which is bound to =C-c % C-b=.
-
-The code used to do this is taken straight from the definition of the
-here-document submode which is built in. It is only very slightly
-changed.
-
-The only problem I have experienced with this is that indentation does
-not seem to work so well in the submode regions. As a work-around I
-usually have another buffer open where I do the coding and then copy and
-past it into the markdown file.
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package mmm-auto
-  ;;   :config
-  ;;   (setq mmm-global-mode 'maybe)
-  ;;   (defvar mmm-markdown-mode-alist '())
-  ;;   (defun mmm-markdown-get-mode (string)
-  ;;     (string-match "[a-zA-Z_-]+" string)
-  ;;     (setq string (match-string 0 string))
-  ;;     (or (mmm-ensure-modename
-  ;;          ;; First try the user override variable.
-  ;;          (some #'(lambda (pair)
-  ;;                    (if (string-match (car pair) string) (cdr pair) nil))
-  ;;                mmm-markdown-mode-alist))
-  ;;         (let ((words (split-string (downcase string) "[_-]+")))
-  ;;           (or (mmm-ensure-modename
-  ;;                ;; Try the whole name, stopping at "mode" if present.
-  ;;                (intern
-  ;;                 (mapconcat #'identity
-  ;;                            (nconc (ldiff words (member "mode" words))
-  ;;                                   (list "mode"))
-  ;;                            "-")))
-  ;;               ;; Try each word by itself (preference list)
-  ;;               (some #'(lambda (word)
-  ;;                         (mmm-ensure-modename (intern word)))
-  ;;                     words)
-  ;;               ;; Try each word with -mode tacked on
-  ;;               (some #'(lambda (word)
-  ;;                         (mmm-ensure-modename
-  ;;                          (intern (concat word "-mode"))))
-  ;;                     words)
-  ;;               ;; Try each pair of words with -mode tacked on
-  ;;               (loop for (one two) on words
-  ;;                     if (mmm-ensure-modename
-  ;;                         (intern (concat one two "-mode")))
-  ;;                     return it)
-  ;;               ;; I'm unaware of any modes whose names, minus `-mode',
-  ;;               ;; are more than two words long, and if the entire mode
-  ;;               ;; name (perhaps minus `-mode') doesn't occur in the
-  ;;               ;; markdownument name, we can give up.
-  ;;               (signal 'mmm-no-matching-submode nil)))))
-  ;;   (mmm-add-classes
-  ;;    '((markdown
-  ;;       :front "```+\\([a-zA-Z0-9_-]+\\)"
-  ;;       :front-offset (end-of-line 1)
-  ;;       :back "```+[ ]*$"
-  ;;       :save-matches 1
-  ;;       :delimiter-mode nil
-  ;;       :match-submode mmm-markdown-get-mode
-  ;;       :end-not-begin t
-  ;;       )))
-  ;;   (mmm-add-mode-ext-class 'markdown-mode "\\.md\\'" 'markdown)
-  ;;   )
-#+END_SRC
-
-** Key bindings
-
-#+BEGIN_SRC emacs-lisp
-  (server-start)
-
-  (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   ;; '(flyspell-duplicate ((t (:underline "DarkOrange"))))
-   ;; '(flyspell-incorrect ((t (:background "#FFCCCC" :underline "Red1"))))
-   ;; '(font-latex-math-face ((t (:foreground "#6E66B6"))))
-   ;; '(highlight ((t (:background "#b5ffd1"))))
-   ;; '(hl-line ((t (:background "#b5ffd1" :underline t))))
-   ;; ;; '(helm-ff-dotted-directory ((t (:foreground "DarkRed"))))
-   ;; '(isearch-fail ((t (:background "#ffcccc"))))
-   ;; '(show-paren-match ((t (:background "#ff4500" :foreground "#e1e1e1" :weight bold)))) 
-   ;; '(sp-pair-overlay-face ((t (:inherit highlight :background "#d1f5ea"))))
-   )
-#+END_SRC
-
-
-   
-
-   
-
-
-
